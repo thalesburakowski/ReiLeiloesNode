@@ -1,0 +1,61 @@
+type User {
+  id: ID! @unique
+  email: String! @unique
+  password: String!
+  flgAdmin: Boolean! @default(value: "false")
+  profile: Profile
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Profile {
+  id: ID! @unique
+  owner: User!
+  name: String!
+  lastName: String!
+  cpf: String!
+  rg: String!
+  birthDate: DateTime!
+  nickName: String!
+  address: [Address!]
+  creditCard: [CreditCard!]
+  bankAccount: [BankAccount!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Address {
+  id: ID! @unique
+  owner: Profile!
+  state: String!
+  city: String!
+  zipCode: String!
+  neighboorhood: String!
+  street: String!
+  number: Int!
+  complement: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type CreditCard {
+  id: ID! @unique
+  owner: Profile!
+  number: String!
+  expireDate: DateTime!
+  securityCode: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type BankAccount {
+  id: ID! @unique
+  owner: Profile!
+  bank: String!
+  accountNumber: String!
+  agencyNumber: String!
+  ownerName: String!
+  ownerCpf: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}

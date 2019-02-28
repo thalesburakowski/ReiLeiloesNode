@@ -1,0 +1,27 @@
+{
+  "name": "reileiloesnode",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "nodemon": "^1.18.10",
+    "prisma-client-lib": "^1.27.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thalesburakowski/ReiLeiloesNode.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thalesburakowski/ReiLeiloesNode/issues"
+  },
+  "homepage": "https://github.com/thalesburakowski/ReiLeiloesNode#readme"
+}
