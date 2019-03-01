@@ -1,33 +1,39 @@
-const { prisma } = require("../../generated/prisma-client");
+const { prisma } = require('../../generated/prisma-client')
+const { responsePrismaError } = require('./utils')
 
 const getProfileByUserId = async (req, res) => {
-  const { id } = req.params;
-  const profile = await prisma
-    .user({ id })
-    .profile()
-    res.json(profile);
-};
+  const { id } = req.params
+  try {
+    const profile = await prisma.user({ id }).profile()
+    res.send(200).json(profile)
+  } catch (error) {
+    responsePrismaError(res, error)
+  }
+}
 
 const createProfile = async (req, res) => {
-  const { userId, name, lastName, cpf, rg, birthDate, nickName } = req.body;
-
-  const profile = await prisma.createProfile({
-    name,
-    lastName,
-    cpf,
-    rg,
-    birthDate,
-    nickName,
-    owner: {
-      connect: {
-        id: userId
-      }
-    }
-  });
-  res.json(profile);
-};
+  const { userId, name, lastName, cpf, rg, birthDate, nickName } = req.body
+  try {
+    const profile = await prisma.createProfile({
+      name,
+      lastName,
+      cpf,
+      rg,
+      birthDate,
+      nickName,
+      owner: {
+        connect: {
+          id: userId,
+        },
+      },
+    })
+    res.status(200).json(profile)
+  } catch (error) {
+    responsePrismaError(res, error)
+  }
+}
 
 module.exports = {
   createProfile,
-  getProfileByUserId
-};
+  getProfileByUserId,
+}

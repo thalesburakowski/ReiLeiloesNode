@@ -1,5 +1,6 @@
-const userRoutes = require('../Controllers/user')
+const app = require('express').Router()
 
-module.exports = {
-    userRoutes,
-}
+require('../Routes/user')(app)
+require('../Routes/profile')(app)
+
+module.exports = app
