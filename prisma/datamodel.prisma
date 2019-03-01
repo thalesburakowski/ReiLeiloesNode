@@ -3,6 +3,7 @@ type User {
   email: String! @unique
   password: String!
   flgAdmin: Boolean! @default(value: "false")
+  active: Boolean! @default(value: "true")
   profile: Profile
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -34,6 +35,7 @@ type Address {
   street: String!
   number: Int!
   complement: String!
+  active: Boolean! @default(value: "true")
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -44,6 +46,7 @@ type CreditCard {
   number: String!
   expireDate: DateTime!
   securityCode: String!
+  active: Boolean! @default(value: "true")
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -56,6 +59,7 @@ type BankAccount {
   agencyNumber: String!
   ownerName: String!
   ownerCpf: String
+  active: Boolean! @default(value: "true")
   createdAt: DateTime!
   updatedAt: DateTime!
 }
