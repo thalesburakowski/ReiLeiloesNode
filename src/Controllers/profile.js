@@ -27,7 +27,7 @@ const createProfile = async (req, res) => {
         },
       },
     })
-    res.status(200).json(profile)
+    res.json(profile)
   } catch (error) {
     responsePrismaError(res, error)
   }
