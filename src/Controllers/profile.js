@@ -2,9 +2,9 @@ const { prisma } = require('../../generated/prisma-client')
 const { responsePrismaError } = require('./utils')
 
 const getProfileByUserId = async (req, res) => {
-  const { id } = req.params
+  const { profileId } = req.params
   try {
-    const profile = await prisma.user({ id }).profile()
+    const profile = await prisma.user({ id: profileId }).profile()
     res.send(200).json(profile)
   } catch (error) {
     responsePrismaError(res, error)

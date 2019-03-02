@@ -35,6 +35,7 @@ type Address {
   street: String!
   number: Int!
   complement: String!
+  name: String!
   active: Boolean! @default(value: "true")
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -46,6 +47,7 @@ type CreditCard {
   number: String!
   expireDate: DateTime!
   securityCode: String!
+  name: String!
   active: Boolean! @default(value: "true")
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -58,7 +60,8 @@ type BankAccount {
   accountNumber: String!
   agencyNumber: String!
   ownerName: String!
-  ownerCpf: String
+  ownerCpf: String!
+  name: String!
   active: Boolean! @default(value: "true")
   createdAt: DateTime!
   updatedAt: DateTime!

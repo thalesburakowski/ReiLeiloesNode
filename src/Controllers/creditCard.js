@@ -1,32 +1,54 @@
 const { prisma } = require('../../generated/prisma-client')
+const { responsePrismaError } = require('./utils')
 
-// const getAllCreditCardByUserId = async (req, res) => {
-//     const { id } = req.params
-//     const creditCards = await prisma.user({ id }).
-//     res.json({ ...user, password: null })
-// }
+const getAllCreditCardByProfileId = async (req, res) => {
+  const { profileId } = req.params
+  try {
+    const creditCards = await prisma
+      .profile({ id: profileId })
+      .creditCard({ where: { active: true } })
+    res.json(creditCards)
+  } catch (error) {
+    console.log(error)
+    responsePrismaError(res, error)
+  }
+}
 
-// const createUser = async (req, res) => {
-//     const { email, password } = req.body
-//     const user = await prisma.createUser({ email, password })
-//     res.json({ ...user, password: null })
-// }
+const createCreditCard = async (req, res) => {
+  const { profileId, number, expireDate, securityCode, name } = req.body
+  try {
+    const creditCard = await prisma.createCreditCard({
+      owner: {
+        connect: {
+          id: profileId,
+        },
+      },
+      number,
+      expireDate,
+      securityCode,
+      name
+    })
+    res.send(200).json(creditCard)
+  } catch (error) {
+    responsePrismaError(res, error)
+  }
+}
 
-// const deleteUser = async (req, res) => {
-//     const { id } = req.params
-//     const user = await prisma.updateUser({ where: { id }, data: { active: false } })
-//     res.json({ ...user, password: null })
-// }
+const deleteCreditCard = async (req, res) => {
+    const { id } = req.params
+    try {
+      await prisma.updateCreditCard({
+        where: { id },
+        data: { active: false },
+      })
+      res.sendStatus(200)
+    } catch (error) {
+      responsePrismaError(res, error)
+    }
+  }
 
-// const updatePassword = async (req, res) => {
-//     const { id, password } = req.body
-//     const user = await prisma.updateUser({ where: { id }, data: { password } })
-//     res.json({ ...user, password: null })
-// }
-
-// module.exports = {
-//     getUserById,
-//     createUser,
-//     deleteUser,
-//     updatePassword
-// }
+module.exports = {
+  getAllCreditCardByProfileId,
+  createCreditCard,
+  deleteCreditCard
+}
