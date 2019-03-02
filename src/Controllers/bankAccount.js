@@ -59,8 +59,23 @@ const deleteBankAccount = async (req, res) => {
   }
 }
 
+const updateName = async (req, res) => {
+  const { id, name } = req.body
+  console.log(req.body)
+  try {
+    const bankAccount = await prisma.updateBankAccount({
+      where: { id },
+      data: { name },
+    })
+    res.json(bankAccount)
+  } catch (error) {
+    responsePrismaError(res, error)
+  }
+}
+
 module.exports = {
   getBankAccount,
   createBankAccount,
   deleteBankAccount,
+  updateName
 }
