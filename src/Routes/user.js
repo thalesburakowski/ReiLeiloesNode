@@ -7,7 +7,17 @@ module.exports = app => {
     .put(userControllers.updatePassword)
 
   app
+    .route('/admin')
+    .post(userControllers.createAdmin)
+    .put(userControllers.updatePassword)
+
+  app
     .route('/user/:id')
+    .get(userControllers.getUserById)
+    .delete(userControllers.deleteUser)
+
+  app
+    .route('/admin/:id')
     .get(userControllers.getUserById)
     .delete(userControllers.deleteUser)
 }
