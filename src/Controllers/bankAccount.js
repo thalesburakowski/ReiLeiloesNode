@@ -37,7 +37,7 @@ const createBankAccount = async (req, res) => {
       ownerCpf,
       name
     })
-    res.send(200).json(bankAccount)
+    res.json(bankAccount)
   } catch (error) {
     responsePrismaError(res, error)
   }
@@ -45,12 +45,29 @@ const createBankAccount = async (req, res) => {
 
 const deleteBankAccount = async (req, res) => {
   const { id } = req.params
+  console.log(id)
   try {
     await prisma.updateBankAccount({
       where: { id },
       data: { active: false },
     })
     res.sendStatus(200)
+  } catch (error) {
+      console.log(error);
+      
+    responsePrismaError(res, error)
+  }
+}
+
+const updateName = async (req, res) => {
+  const { id, name } = req.body
+  console.log(req.body)
+  try {
+    const bankAccount = await prisma.updateBankAccount({
+      where: { id },
+      data: { name },
+    })
+    res.json(bankAccount)
   } catch (error) {
     responsePrismaError(res, error)
   }
@@ -60,4 +77,5 @@ module.exports = {
   getBankAccount,
   createBankAccount,
   deleteBankAccount,
+  updateName
 }

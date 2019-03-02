@@ -9,7 +9,6 @@ const getAllCreditCardByProfileId = async (req, res) => {
       .creditCard({ where: { active: true } })
     res.json(creditCards)
   } catch (error) {
-    console.log(error)
     responsePrismaError(res, error)
   }
 }
@@ -26,29 +25,44 @@ const createCreditCard = async (req, res) => {
       number,
       expireDate,
       securityCode,
-      name
+      name,
     })
-    res.send(200).json(creditCard)
+    res.json(creditCard)
   } catch (error) {
     responsePrismaError(res, error)
   }
 }
 
 const deleteCreditCard = async (req, res) => {
-    const { id } = req.params
-    try {
-      await prisma.updateCreditCard({
-        where: { id },
-        data: { active: false },
-      })
-      res.sendStatus(200)
-    } catch (error) {
-      responsePrismaError(res, error)
-    }
+  const { id } = req.params
+  try {
+    await prisma.updateCreditCard({
+      where: { id },
+      data: { active: false },
+    })
+    res.sendStatus(200)
+  } catch (error) {
+    responsePrismaError(res, error)
   }
+}
+
+const updateName = async (req, res) => {
+  const { id, name } = req.body
+  console.log(req.body)
+  try {
+    const creditCard = await prisma.updateCreditCard({
+      where: { id },
+      data: { name },
+    })
+    res.json(creditCard)
+  } catch (error) {
+    responsePrismaError(res, error)
+  }
+}
 
 module.exports = {
   getAllCreditCardByProfileId,
   createCreditCard,
-  deleteCreditCard
+  deleteCreditCard,
+  updateName,
 }
