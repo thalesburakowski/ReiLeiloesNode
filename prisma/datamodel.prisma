@@ -66,3 +66,67 @@ type BankAccount {
   createdAt: DateTime!
   updatedAt: DateTime!
 }
+
+type Wallet {
+  id: ID! @unique
+  owner: Profile!
+  credits: Float!
+  pendingCredits: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Auction {
+  id: ID! @unique
+  owner: Profile!
+  winner: Profile
+  title: String!
+  categories: [Category!]
+  description: String!
+  height: Float!
+  width: Float!
+  depth: Float!
+  initialPrice: Float!
+  closePrice: Float!
+  historic: [Bid!]
+  status: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Category {
+  id: ID! @unique
+  name: String!
+  parentalRating: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Bid {
+  id: ID! @unique
+  owner: Profile!
+  auction: Auction!
+  value: Float!
+  show: Boolean! @default(value: "true")
+  createdAt: DateTime!
+}
+
+type AuctionRequest {
+  id: ID! @unique
+  auction: Auction!
+  admin: User!
+  approved: Boolean!
+  reason: String
+  createdAt: DateTime!
+}
+
+type AuctionCancellationRequest {
+  id: ID! @unique
+  auction: Auction!
+  ownerProfile: Profile!
+  reasonRequest: String!
+  admin: User
+  status: String!
+  reasonResponse: String
+  createdAt: DateTime!
+}
