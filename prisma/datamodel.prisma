@@ -103,7 +103,7 @@ type Category {
   updatedAt: DateTime!
 }
 
-type Bid {
+type Bid { 
   id: ID! @unique
   owner: Profile!
   auction: Auction!
