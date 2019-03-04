@@ -88,6 +88,7 @@ type Auction {
   depth: Float!
   initialPrice: Float!
   closePrice: Float!
+  finalPrice: Float
   historic: [Bid!]
   status: String!
   createdAt: DateTime!
@@ -114,7 +115,6 @@ type Bid {
 type AuctionRequest {
   id: ID! @unique
   auction: Auction!
-  admin: User!
   approved: Boolean!
   reason: String
   createdAt: DateTime!
@@ -125,7 +125,6 @@ type AuctionCancellationRequest {
   auction: Auction!
   ownerProfile: Profile!
   reasonRequest: String!
-  admin: User
   status: String!
   reasonResponse: String
   createdAt: DateTime!
