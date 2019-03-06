@@ -5,7 +5,7 @@ const getUserById = async (req, res) => {
   const { id } = req.params
   try {
     const user = await prisma.user({ id })
-    res.send(200).json({ ...user, password: null })
+    res.json({ ...user, password: null })
   } catch (error) {
     responsePrismaError(res, error)
   }
