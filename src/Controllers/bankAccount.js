@@ -1,47 +1,60 @@
 const { prisma } = require('../../generated/prisma-client')
 const { responsePrismaError } = require('./utils')
 
-const getAllCreditCardByProfileId = async (req, res) => {
+const getBankAccount = async (req, res) => {
   const { profileId } = req.params
   try {
-    const creditCards = await prisma
+    const bankAccount = await prisma
       .profile({ id: profileId })
-      .creditCard({ where: { active: true } })
-    res.json(creditCards)
+      .bankAccount({ where: { active: true } })
+    res.json(bankAccount)
   } catch (error) {
     responsePrismaError(res, error)
   }
 }
 
-const createCreditCard = async (req, res) => {
-  const { profileId, number, expireDate, securityCode, name } = req.body
+const createBankAccount = async (req, res) => {
+  const {
+    profileId,
+    bank,
+    accountNumber,
+    agencyNumber,
+    ownerName,
+    ownerCpf,
+    name,
+  } = req.body
   try {
-    const creditCard = await prisma.createCreditCard({
+    const bankAccount = await prisma.createBankAccount({
       owner: {
         connect: {
           id: profileId,
         },
       },
-      number,
-      expireDate,
-      securityCode,
-      name,
+      bank,
+      accountNumber,
+      agencyNumber,
+      ownerName,
+      ownerCpf,
+      name
     })
-    res.json(creditCard)
+    res.json(bankAccount)
   } catch (error) {
     responsePrismaError(res, error)
   }
 }
 
-const deleteCreditCard = async (req, res) => {
+const deleteBankAccount = async (req, res) => {
   const { id } = req.params
+  console.log(id)
   try {
-    await prisma.updateCreditCard({
+    await prisma.updateBankAccount({
       where: { id },
       data: { active: false },
     })
     res.sendStatus(200)
   } catch (error) {
+      console.log(error);
+      
     responsePrismaError(res, error)
   }
 }
@@ -50,19 +63,19 @@ const updateName = async (req, res) => {
   const { id, name } = req.body
   console.log(req.body)
   try {
-    const creditCard = await prisma.updateCreditCard({
+    const bankAccount = await prisma.updateBankAccount({
       where: { id },
       data: { name },
     })
-    res.json(creditCard)
+    res.json(bankAccount)
   } catch (error) {
     responsePrismaError(res, error)
   }
 }
 
 module.exports = {
-  getAllCreditCardByProfileId,
-  createCreditCard,
-  deleteCreditCard,
-  updateName,
+  getBankAccount,
+  createBankAccount,
+  deleteBankAccount,
+  updateName
 }

@@ -21,6 +21,16 @@ const createUser = async (req, res) => {
   }
 }
 
+const createAdmin = async (req, res) => {
+  const { email, password } = req.body
+  try {
+    const user = await prisma.createUser({ email, password, flgAdmin: true })
+    res.json({ ...user, password: null })
+  } catch (error) {
+    responsePrismaError(res, error)
+  }
+}
+
 const deleteUser = async (req, res) => {
   const { id } = req.params
   try {
@@ -47,6 +57,7 @@ const updatePassword = async (req, res) => {
 module.exports = {
   getUserById,
   createUser,
+  createAdmin,
   deleteUser,
   updatePassword,
 }

@@ -35,6 +35,7 @@ type Address {
   street: String!
   number: Int!
   complement: String!
+  name: String!
   active: Boolean! @default(value: "true")
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -46,6 +47,7 @@ type CreditCard {
   number: String!
   expireDate: DateTime!
   securityCode: String!
+  name: String!
   active: Boolean! @default(value: "true")
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -58,8 +60,72 @@ type BankAccount {
   accountNumber: String!
   agencyNumber: String!
   ownerName: String!
-  ownerCpf: String
+  ownerCpf: String!
+  name: String!
   active: Boolean! @default(value: "true")
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+type Wallet {
+  id: ID! @unique
+  owner: Profile!
+  credits: Float!
+  pendingCredits: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Auction {
+  id: ID! @unique
+  owner: Profile!
+  winner: Profile
+  title: String!
+  categories: [Category!]
+  description: String!
+  height: Float!
+  width: Float!
+  depth: Float!
+  initialPrice: Float!
+  closePrice: Float!
+  finalPrice: Float
+  historic: [Bid!]
+  status: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Category {
+  id: ID! @unique
+  name: String!
+  parentalRating: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Bid { 
+  id: ID! @unique
+  owner: Profile!
+  auction: Auction!
+  value: Float!
+  show: Boolean! @default(value: "true")
+  createdAt: DateTime!
+}
+
+type AuctionRequest {
+  id: ID! @unique
+  auction: Auction!
+  approved: Boolean!
+  reason: String
+  createdAt: DateTime!
+}
+
+type AuctionCancellationRequest {
+  id: ID! @unique
+  auction: Auction!
+  ownerProfile: Profile!
+  reasonRequest: String!
+  status: String!
+  reasonResponse: String
+  createdAt: DateTime!
 }
