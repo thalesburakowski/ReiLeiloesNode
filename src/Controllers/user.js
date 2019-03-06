@@ -11,6 +11,20 @@ const getUserById = async (req, res) => {
   }
 }
 
+const Login = async (req, res) => {
+  const { email, password } = req.body
+  try {
+    const user = await prisma.user({ email })
+    if (user.password == password) {
+      res.json({ ...user, password: null })
+      return
+    }
+    res.json({ message: 'Email ou senha incorretas!' })
+  } catch (error) {
+    responsePrismaError(res, error)
+  }
+}
+
 const createUser = async (req, res) => {
   const { email, password } = req.body
   try {
@@ -55,6 +69,7 @@ const updatePassword = async (req, res) => {
 }
 
 module.exports = {
+  Login,
   getUserById,
   createUser,
   createAdmin,

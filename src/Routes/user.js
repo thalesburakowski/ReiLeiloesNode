@@ -6,6 +6,10 @@ module.exports = app => {
     .post(userControllers.createUser)
     .put(userControllers.updatePassword)
 
+  app.
+    route('/login')
+    .post(userControllers.Login)
+
   app
     .route('/admin')
     .post(userControllers.createAdmin)
