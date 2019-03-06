@@ -12,10 +12,10 @@ const getUserById = async (req, res) => {
 }
 
 const Login = async (req, res) => {
-  const { email, password } = req.body
+  const { Email, Password } = req.body
   try {
-    const user = await prisma.user({ email })
-    if (user.password == password) {
+    const user = await prisma.user({ email: Email })
+    if (user.password == Password) {
       res.json({ ...user, password: null })
       return
     }
@@ -59,9 +59,9 @@ const deleteUser = async (req, res) => {
 }
 
 const updatePassword = async (req, res) => {
-  const { id, password } = req.body
+  const { Id, Password } = req.body
   try {
-    const user = await prisma.updateUser({ where: { id }, data: { password } })
+    const user = await prisma.updateUser({ where: { id: Id }, data: { password: Password } })
     res.json({ ...user, password: null })
   } catch (error) {
     responsePrismaError(res, error)
