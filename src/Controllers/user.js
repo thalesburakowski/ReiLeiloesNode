@@ -25,10 +25,40 @@ const Login = async (req, res) => {
   }
 }
 
-const createUser = async (req, res) => {
-  const { email, password } = req.body
+const verifyEmail = async (req, res) => {
+  console.log('verifyEmail')
+
+  const { Email } = req.body
   try {
-    const user = await prisma.createUser({ email, password })
+    const user = await prisma.user({ email: Email })
+    if (!user) {
+      res.json({ active: null })
+    } else if (!user.active) {
+      res.json({ active: false })
+    } else if (user.active) {
+      res.json({ active: true })
+    }
+  } catch (error) {
+    responsePrismaError(res, error)
+  }
+}
+
+const reactivateUser = async (req, res) => {
+  const { Email, Password } = req.body
+  try {
+    const user = await prisma.updateUser({
+      where: { email: Email },
+      data: { password: Password, active: true },
+    })
+
+    res.json(user)
+  } catch (error) {}
+}
+
+const createUser = async (req, res) => {
+  const { Email, Password } = req.body
+  try {
+    const user = await prisma.createUser({ email: Email, password: Password })
     res.json({ ...user, password: null })
   } catch (error) {
     responsePrismaError(res, error)
@@ -61,7 +91,10 @@ const deleteUser = async (req, res) => {
 const updatePassword = async (req, res) => {
   const { Id, Password } = req.body
   try {
-    const user = await prisma.updateUser({ where: { id: Id }, data: { password: Password } })
+    const user = await prisma.updateUser({
+      where: { id: Id },
+      data: { password: Password },
+    })
     res.json({ ...user, password: null })
   } catch (error) {
     responsePrismaError(res, error)
@@ -71,6 +104,8 @@ const updatePassword = async (req, res) => {
 module.exports = {
   Login,
   getUserById,
+  verifyEmail,
+  reactivateUser,
   createUser,
   createAdmin,
   deleteUser,
