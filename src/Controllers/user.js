@@ -34,9 +34,9 @@ const verifyEmail = async (req, res) => {
     if (!user) {
       res.json({ response: "inexistente" })
     } else if (!user.active) {
-      res.json({ response: "ativo" })
-    } else if (user.active) {
       res.json({ response: "inativo" })
+    } else if (user.active) {
+      res.json({ response: "ativo" })
     }
   } catch (error) {
     responsePrismaError(res, error)
