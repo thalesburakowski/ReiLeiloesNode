@@ -12,10 +12,7 @@ module.exports = app => {
 
   app.route('/reactivateUser').put(userControllers.reactivateUser)
 
-  app
-    .route('/admin')
-    .post(userControllers.createAdmin)
-    .put(userControllers.updatePassword)
+  app.route('/admin').post(userControllers.createAdmin)
 
   app
     .route('/user/:id')

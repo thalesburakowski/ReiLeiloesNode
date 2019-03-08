@@ -12,10 +12,10 @@ const getUserById = async (req, res) => {
 }
 
 const Login = async (req, res) => {
-  const { Email, Password } = req.body
+  const { Email: email, Password: password } = req.body
   try {
-    const user = await prisma.user({ email: Email })
-    if (user.password == Password) {
+    const user = await prisma.user({ email })
+    if (user.password == password) {
       res.json({ ...user, password: null })
       return
     }
@@ -26,11 +26,9 @@ const Login = async (req, res) => {
 }
 
 const verifyEmail = async (req, res) => {
-  console.log('verifyEmail')
-
-  const { Email } = req.body
+  const { Email: email } = req.body
   try {
-    const user = await prisma.user({ email: Email })
+    const user = await prisma.user({ email })
     if (!user) {
       res.json({ active: null })
     } else if (!user.active) {
@@ -44,11 +42,11 @@ const verifyEmail = async (req, res) => {
 }
 
 const reactivateUser = async (req, res) => {
-  const { Email, Password } = req.body
+  const { Email: email, Password: password } = req.body
   try {
     const user = await prisma.updateUser({
-      where: { email: Email },
-      data: { password: Password, active: true },
+      where: { email },
+      data: { password, active: true },
     })
 
     res.json(user)
@@ -56,9 +54,9 @@ const reactivateUser = async (req, res) => {
 }
 
 const createUser = async (req, res) => {
-  const { Email, Password } = req.body
+  const { Email: email, Password: password } = req.body
   try {
-    const user = await prisma.createUser({ email: Email, password: Password })
+    const user = await prisma.createUser({ email, password })
     res.json({ ...user, password: null })
   } catch (error) {
     responsePrismaError(res, error)
@@ -66,7 +64,7 @@ const createUser = async (req, res) => {
 }
 
 const createAdmin = async (req, res) => {
-  const { email, password } = req.body
+  const { Email: email, Password: password } = req.body
   try {
     const user = await prisma.createUser({ email, password, flgAdmin: true })
     res.json({ ...user, password: null })
@@ -89,11 +87,11 @@ const deleteUser = async (req, res) => {
 }
 
 const updatePassword = async (req, res) => {
-  const { Id, Password } = req.body
+  const { Id: id, Password: password } = req.body
   try {
     const user = await prisma.updateUser({
-      where: { id: Id },
-      data: { password: Password },
+      where: { id },
+      data: { password },
     })
     res.json({ ...user, password: null })
   } catch (error) {
