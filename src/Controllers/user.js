@@ -32,11 +32,11 @@ const verifyEmail = async (req, res) => {
   try {
     const user = await prisma.user({ email: Email })
     if (!user) {
-      res.json({ active: null })
+      res.json({ response: "inexistente" })
     } else if (!user.active) {
-      res.json({ active: false })
+      res.json({ response: "ativo" })
     } else if (user.active) {
-      res.json({ active: true })
+      res.json({ response: "inativo" })
     }
   } catch (error) {
     responsePrismaError(res, error)
