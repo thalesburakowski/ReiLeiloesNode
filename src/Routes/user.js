@@ -19,8 +19,8 @@ module.exports = app => {
     .get(userControllers.getUserById)
     .delete(userControllers.deleteUser)
 
-  app
-    .route('/admin/:id')
-    .get(userControllers.getUserById)
-    .delete(userControllers.deleteUser)
+  // app
+  //   .route('/admin/:id')
+  //   .get(userControllers.getUserById)
+  //   .delete(userControllers.deleteUser)
 }
