@@ -15,11 +15,12 @@ const Login = async (req, res) => {
   const { Email: email, Password: password } = req.body
   try {
     const user = await prisma.user({ email })
+    if (!user) res.send(400)
     if (user.password == password) {
       res.json({ ...user, password: null })
       return
     }
-    res.json({ message: 'Email ou senha incorretas!' })
+    res.send(400)
   } catch (error) {
     responsePrismaError(res, error)
   }
@@ -30,11 +31,11 @@ const verifyEmail = async (req, res) => {
   try {
     const user = await prisma.user({ email })
     if (!user) {
-      res.json({ response: "inexistente" })
+      res.json({ response: 'inexistente' })
     } else if (!user.active) {
-      res.json({ response: "inativo" })
+      res.json({ response: 'inativo' })
     } else if (user.active) {
-      res.json({ response: "ativo" })
+      res.json({ response: 'ativo' })
     }
   } catch (error) {
     responsePrismaError(res, error)
