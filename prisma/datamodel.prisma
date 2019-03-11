@@ -33,7 +33,7 @@ type Address {
   zipCode: String!
   neighboorhood: String!
   street: String!
-  number: Int!
+  number: String!
   complement: String!
   name: String!
   active: Boolean! @default(value: "true")
