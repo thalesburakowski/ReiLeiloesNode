@@ -5,7 +5,6 @@ const getAllAddressesByProfileId = async (req, res) => {
   const { profileId } = req.params
   const { name } = req.query
   const { zipCode } = req.query
-  console.log('*********')
 
   try {
     if (name) {
@@ -21,7 +20,6 @@ const getAllAddressesByProfileId = async (req, res) => {
       const addresses = await prisma
         .profile({ id: profileId })
         .address({ where: { active: true } })
-      console.log(addresses)
 
       res.json(addresses)
     }
@@ -38,12 +36,12 @@ const createAddress = async (req, res) => {
     City: city,
     Neighboorhood: neighboorhood,
     Street: street,
+    Number: number,
     Complement: complement,
     ZipCode: zipCode,
   } = req.body
 
-  let { Number: number } = req.body
-  number = parseInt(number)
+  // let { Number: number } = req.body
   try {
     const address = await prisma.createAddress({
       name,
@@ -56,7 +54,6 @@ const createAddress = async (req, res) => {
       zipCode,
       owner: { connect: { id: profileId } },
     })
-    console.log(address)
     res.json(address)
   } catch (error) {
     console.log(error)

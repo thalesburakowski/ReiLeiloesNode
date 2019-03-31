@@ -21,6 +21,8 @@ type Profile {
   address: [Address!]
   creditCard: [CreditCard!]
   bankAccount: [BankAccount!]
+  selling: [Auction!] @relation(name: "Owner")
+  win: [Auction!] @relation(name: "Win")
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -78,8 +80,8 @@ type Wallet {
 
 type Auction {
   id: ID! @unique
-  owner: Profile!
-  winner: Profile
+  owner: Profile! @relation(name: "Owner")
+  winner: Profile @relation(name: "Win")
   title: String!
   categories: [Category!]
   description: String!
@@ -103,7 +105,7 @@ type Category {
   updatedAt: DateTime!
 }
 
-type Bid { 
+type Bid {
   id: ID! @unique
   owner: Profile!
   auction: Auction!
