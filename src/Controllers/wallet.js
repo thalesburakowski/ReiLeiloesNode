@@ -5,7 +5,7 @@ const getWalletByProfileId = async (req, res) => {
   const { profileId } = req.params
   try {
     const wallet = await prisma.profile({ id: profileId }).wallet()
-    res.status(wallet)
+    res.send(wallet)
   } catch (error) {
     responsePrismaError(res, error)
   }
@@ -24,29 +24,33 @@ const deposit = async (req, res) => {
   } = req.body
   try {
     if (value < 15) {
-      return res
-        .status(400)
-        .send({ message: 'O valor tem que ser maior do que zero' })
+      return res.send({
+        success: false,
+        message: 'O valor tem que ser maior do que zero',
+      })
     }
 
     if (newCreditCard) {
       if (!name) {
-        res.status(400).send({ message: 'O nome deve ser preenchido!' })
+        res.send({ success: false, message: 'O nome deve ser preenchido!' })
       }
       if (!number) {
-        return res
-          .status(400)
-          .send({ message: 'O número do cartão deve ser preenchido' })
+        return res.send({
+          success: false,
+          message: 'O número do cartão deve ser preenchido',
+        })
       }
 
       if (!expireDate) {
-        res.status(400).send({
+        res.send({
+          success: false,
           message: 'A data de expiração deve ser preenchida',
         })
       }
 
       if (!securityCode) {
-        res.status(400).send({
+        res.send({
+          success: false,
           message: 'O código de segurança deve ser preenchido',
         })
       }
@@ -58,7 +62,8 @@ const deposit = async (req, res) => {
         number[0] != '5' ||
         number[0] != '6'
       ) {
-        res.status(400).send({
+        res.send({
+          success: false,
           message: 'Nós não aceitamos essa bandeira',
         })
       }
@@ -68,7 +73,8 @@ const deposit = async (req, res) => {
       })
 
       if (creditCardExists) {
-        res.status(400).send({
+        res.send({
+          success: false,
           message: 'O nome deve ser unico!',
         })
       }
@@ -83,7 +89,10 @@ const deposit = async (req, res) => {
     } // fechou parte de novo cartão
 
     if (!number) {
-      return res.status(400).send({ message: 'Nenhum cartão foi selecionado' })
+      return res.send({
+        success: false,
+        message: 'Nenhum cartão foi selecionado',
+      })
     }
 
     const creditCardExists = await prisma.creditCards({
@@ -91,12 +100,14 @@ const deposit = async (req, res) => {
     })
 
     if (!creditCardExists) {
-      return res.status(400).send({
-        message: 'Este cartão selecionado não existe',
+      return ressend({
+        ssuccess: false,
+        message: 'Já existe um cartão com esse nome',
       })
     }
     if (value > 3000) {
-      res.status(400).send({
+      res.send({
+        success: false,
         message:
           'Você não possui esse valor na sua conta bancária, tente um valor menor!',
       })
@@ -128,12 +139,33 @@ const withdraw = async (req, res) => {
     bank,
   } = req.body
 
-  if (value <= 0) {
-    return res
-      .status(400)
-      .send({ message: 'O valor tem que ser maior do que zero' })
-  }
   try {
+    if (value <= 0) {
+      return res
+        .status(400)
+        .send({
+          success: false,
+          message: 'O valor tem que ser maior do que zero',
+        })
+    }
+
+    if (newBankAccount) {
+      if (!owner || !name || !accountNumber || !agencyNumber || !bank) {
+        return res
+          .status(400)
+          .send({ success: false, message: 'Os campos devem ser preenchidos!' })
+      }
+      const bankAccountCardExists = await prisma.bankAccounts({
+        where: { name_contains: name },
+      })
+
+      if (!bankAccountCardExists) {
+        return res.send({
+          success: false,
+          message: 'Já existe uma conta bancária com esse nome',
+        })
+      }
+    } // fechou parte da nova conta bancária
   } catch (error) {
     responsePrismaError(res, error)
   }
