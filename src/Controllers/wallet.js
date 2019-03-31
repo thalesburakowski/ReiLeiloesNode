@@ -121,7 +121,7 @@ const deposit = async (req, res) => {
       data: { credits: wallet.credits + value },
     })
 
-    res.status(walletUpdated)
+    res.send(walletUpdated)
   } catch (error) {
     responsePrismaError(res, error)
   }
@@ -142,7 +142,6 @@ const withdraw = async (req, res) => {
   try {
     if (value <= 0) {
       return res
-        .status(400)
         .send({
           success: false,
           message: 'O valor tem que ser maior do que zero',
@@ -152,7 +151,6 @@ const withdraw = async (req, res) => {
     if (newBankAccount) {
       if (!owner || !name || !accountNumber || !agencyNumber || !bank) {
         return res
-          .status(400)
           .send({ success: false, message: 'Os campos devem ser preenchidos!' })
       }
       const bankAccountCardExists = await prisma.bankAccounts({
