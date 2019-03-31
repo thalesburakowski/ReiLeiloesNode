@@ -82,7 +82,6 @@ const deposit = async (req, res) => {
       })
     } // fechou parte de novo cartão
 
-    console.log('entrou')
     if (!number) {
       return res.status(400).send({ message: 'Nenhum cartão foi selecionado' })
     }
