@@ -100,7 +100,7 @@ const deposit = async (req, res) => {
     })
 
     if (!creditCardExists) {
-      return ressend({
+      return res.send({
         ssuccess: false,
         message: 'Já existe um cartão com esse nome',
       })
