@@ -34,7 +34,9 @@ const deposit = async (req, res) => {
       res.json(400).send({ message: 'O nome deve ser preenchido!' })
     }
     if (!number) {
-      return res.json(400).send({ message: 'O número do cartão deve ser preenchido' })
+      return res
+        .json(400)
+        .send({ message: 'O número do cartão deve ser preenchido' })
     }
 
     if (!expireDate) {
@@ -69,7 +71,7 @@ const deposit = async (req, res) => {
       })
     }
 
-    const creditCard = await prisma.createCreditCard({
+    await prisma.createCreditCard({
       name,
       expireDate,
       number,
@@ -82,6 +84,15 @@ const deposit = async (req, res) => {
     return res.json(400).send({ message: 'Nenhum cartão foi selecionado' })
   }
 
+  const creditCardExists = await prisma.creditCards({
+    where: { name_contains: name },
+  })
+
+  if (!creditCardExists) {
+    return res.json(400).send({
+      message: 'Este cartão selecionado não existe',
+    })
+  }
   if (value > 3000) {
     res.json(400).send({
       message:
@@ -105,7 +116,7 @@ const deposit = async (req, res) => {
 }
 
 const withdraw = async (req, res) => {
-  const { profileId, owner, accountNumber, agencyNumber, bank } = req.body
+  const { profileId, owner, name, accountNumber, agencyNumber, bank } = req.body
   try {
   } catch (error) {
     responsePrismaError(res, error)
@@ -114,4 +125,6 @@ const withdraw = async (req, res) => {
 
 module.exports = {
   getWalletByProfileId,
+  deposit,
+  withdraw,
 }
