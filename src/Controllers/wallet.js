@@ -82,6 +82,13 @@ const deposit = async (req, res) => {
         })
       }
 
+      if (new Date(expireDate) < new Date()) {
+        res.send({
+          success: false,
+          message: 'A data precisa ser superior a data atual',
+        })
+      }
+
       await prisma.createCreditCard({
         name,
         expireDate,
@@ -111,6 +118,13 @@ const deposit = async (req, res) => {
         message: 'Não existe esse cartão de crédito',
       })
     }
+
+    if (new Date(creditCardExists[0].expireDate) < new Date()) {
+        res.send({
+          success: false,
+          message: 'Esse cartão está com a data expirada',
+        })
+      }
     if (value > 3000) {
       res.send({
         success: false,
@@ -118,6 +132,8 @@ const deposit = async (req, res) => {
           'Você não possui esse valor na sua conta bancária, tente um valor menor!',
       })
     }
+
+    
 
     const wallet = await prisma.profile({ id: profileId }).wallet()
 
