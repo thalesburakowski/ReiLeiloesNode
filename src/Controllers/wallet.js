@@ -5,7 +5,7 @@ const getWalletByProfileId = async (req, res) => {
   const { profileId } = req.params
   try {
     const wallet = await prisma.profile({ id: profileId }).wallet()
-    res.send(wallet)
+    res.send({ success: true, ...wallet })
   } catch (error) {
     console.log(error)
     responsePrismaError(res, error)
@@ -126,7 +126,7 @@ const deposit = async (req, res) => {
       data: { credits: wallet.credits + parseInt(value) },
     })
 
-    res.send(walletUpdated)
+    res.send({ success: true, ...walletUpdated })
   } catch (error) {
     responsePrismaError(res, error)
   }
@@ -154,7 +154,14 @@ const withdraw = async (req, res) => {
     }
 
     if (newBankAccount) {
-      if (!owner || !name || !accountNumber || !agencyNumber || !bank || !ownerCpf) {
+      if (
+        !owner ||
+        !name ||
+        !accountNumber ||
+        !agencyNumber ||
+        !bank ||
+        !ownerCpf
+      ) {
         return res.send({
           success: false,
           message: 'Os campos devem ser preenchidos!',
@@ -180,6 +187,7 @@ const withdraw = async (req, res) => {
         ownerName: owner,
         owner: { connect: { id: profileId } },
       })
+      console.log(bankAccount)
     } // fechou parte da nova conta bancária
 
     const bankAccountExists = await prisma
@@ -195,13 +203,19 @@ const withdraw = async (req, res) => {
 
     const wallet = await prisma.profile({ id: profileId }).wallet()
     console.log(wallet)
+    if (wallet.credits < value) {
+      return res.send({
+        success: false,
+        message: 'Você não tem esse valor na sua conta',
+      })
+    }
 
     const walletUpdated = await prisma.updateWallet({
       where: { id: wallet.id },
       data: { credits: wallet.credits - parseInt(value) },
     })
 
-    res.send(walletUpdated)
+    res.send({ success: true, ...walletUpdated })
   } catch (error) {
     console.log(error)
     responsePrismaError(res, error)
