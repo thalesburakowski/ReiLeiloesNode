@@ -74,6 +74,11 @@ const createProfile = async (req, res) => {
         },
       },
     })
+    await prisma.createWallet({
+      credits: 0,
+      pendingCredits: 0,
+      owner: { connect: {id: profile.id} },
+    })
     res.json(profile)
   } catch (error) {
     responsePrismaError(res, error)
