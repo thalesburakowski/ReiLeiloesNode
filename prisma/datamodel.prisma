@@ -18,6 +18,7 @@ type Profile {
   rg: String!
   birthDate: DateTime!
   nickName: String!
+  wallet: Wallet
   address: [Address!]
   creditCard: [CreditCard!]
   bankAccount: [BankAccount!]

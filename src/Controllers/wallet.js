@@ -7,6 +7,7 @@ const getWalletByProfileId = async (req, res) => {
     const wallet = await prisma.profile({ id: profileId }).wallet()
     res.send(wallet)
   } catch (error) {
+    console.log(error)
     responsePrismaError(res, error)
   }
 }
@@ -157,48 +158,26 @@ const withdraw = async (req, res) => {
           message: 'Os campos devem ser preenchidos!',
         })
       }
-      const nameBankAccountExists = await prisma
+      const bankAccountExists = await prisma
         .profile({ id: profileId })
-        .bankAccount({ where: { name_contains: name } })
+        .bankAccount()
 
-      if (nameBankAccountExists.length) {
+      if (bankAccountExists.length) {
         return res.send({
           success: false,
-          message: 'Já existe uma conta bancária com esse nome',
-        })
-      }
-
-      const accountNumberExists = await prisma
-        .profile({ id: profileId })
-        .bankAccount({ where: { accountNumber_contains: accountNumber } })
-
-      if (accountNumberExists.length) {
-        return res.send({
-          success: false,
-          message: 'Já existe uma conta bancária com esse número',
+          message: 'Já existe uma conta bancária nesse perfil',
         })
       }
     } // fechou parte da nova conta bancária
 
-    const nameBankAccountExists = await prisma
+    const bankAccountExists = await prisma
       .profile({ id: profileId })
       .bankAccount({ where: { name_contains: name } })
 
-    if (nameBankAccountExists.length) {
+    if (bankAccountExists.length) {
       return res.send({
         success: false,
         message: 'Já existe uma conta bancária com esse nome',
-      })
-    }
-
-    const accountNumberExists = await prisma
-      .profile({ id: profileId })
-      .bankAccount({ where: { accountNumber_contains: accountNumber } })
-
-    if (!accountNumberExists.length) {
-      return res.send({
-        success: false,
-        message: 'Não existe uma conta bancária com esse número',
       })
     }
 
@@ -212,6 +191,7 @@ const withdraw = async (req, res) => {
 
     res.send(walletUpdated)
   } catch (error) {
+    console.log(error)
     responsePrismaError(res, error)
   }
 }
