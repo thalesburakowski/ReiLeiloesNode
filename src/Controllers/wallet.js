@@ -22,6 +22,7 @@ const deposit = async (req, res) => {
     securityCode,
     name,
   } = req.body
+
   try {
     if (value < 15) {
       return res.send({
@@ -30,7 +31,7 @@ const deposit = async (req, res) => {
       })
     }
 
-    if (newCreditCard) {
+    if (newBankAccount) {
       if (!name) {
         res.send({ success: false, message: 'O nome deve ser preenchido!' })
       }
@@ -56,10 +57,10 @@ const deposit = async (req, res) => {
       }
 
       if (
-        number[0] != '2' ||
-        number[0] != '3' ||
-        number[0] != '4' ||
-        number[0] != '5' ||
+        number[0] != '2' &&
+        number[0] != '3' &&
+        number[0] != '4' &&
+        number[0] != '5' &&
         number[0] != '6'
       ) {
         res.send({
@@ -102,7 +103,7 @@ const deposit = async (req, res) => {
     if (!creditCardExists) {
       return res.send({
         ssuccess: false,
-        message: 'Já existe um cartão com esse nome',
+        message: 'Não existe esse cartão de crédito',
       })
     }
     if (value > 3000) {
@@ -141,29 +142,73 @@ const withdraw = async (req, res) => {
 
   try {
     if (value <= 0) {
-      return res
-        .send({
-          success: false,
-          message: 'O valor tem que ser maior do que zero',
-        })
+      return res.send({
+        success: false,
+        message: 'O valor tem que ser maior do que zero',
+      })
     }
 
     if (newBankAccount) {
       if (!owner || !name || !accountNumber || !agencyNumber || !bank) {
-        return res
-          .send({ success: false, message: 'Os campos devem ser preenchidos!' })
+        return res.send({
+          success: false,
+          message: 'Os campos devem ser preenchidos!',
+        })
       }
-      const bankAccountCardExists = await prisma.bankAccounts({
-        where: { name_contains: name },
-      })
+      const nameBankAccountExists = await prisma
+        .profile({ id: profileId })
+        .bankAccount({ where: { name_contains: name } })
 
-      if (!bankAccountCardExists) {
+      if (nameBankAccountExists) {
         return res.send({
           success: false,
           message: 'Já existe uma conta bancária com esse nome',
         })
       }
+
+      const accountNumberExists = await prisma
+        .profile({ id: profileId })
+        .bankAccount({ where: { accountNumber_contains: accountNumber } })
+
+      if (accountNumberExists) {
+        return res.send({
+          success: false,
+          message: 'Já existe uma conta bancária com esse número',
+        })
+      }
     } // fechou parte da nova conta bancária
+
+    const nameBankAccountExists = await prisma
+      .profile({ id: profileId })
+      .bankAccount({ where: { name_contains: name } })
+
+    if (nameBankAccountExists) {
+      return res.send({
+        success: false,
+        message: 'Já existe uma conta bancária com esse nome',
+      })
+    }
+
+    const accountNumberExists = await prisma
+      .profile({ id: profileId })
+      .bankAccount({ where: { accountNumber_contains: accountNumber } })
+
+    if (!accountNumberExists) {
+      return res.send({
+        success: false,
+        message: 'Não existe uma conta bancária com esse número',
+      })
+    }
+
+    const wallet = await prisma.profile({ id: profileId }).wallet()
+    console.log(wallet)
+
+    const walletUpdated = await prisma.updateWallet({
+      where: { id: wallet.id },
+      data: { credits: wallet.credits - value },
+    })
+
+    res.send(walletUpdated)
   } catch (error) {
     responsePrismaError(res, error)
   }
