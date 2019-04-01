@@ -99,9 +99,11 @@ const deposit = async (req, res) => {
       })
     }
 
-    const creditCardExists = await prisma.profile({ id: profileId }).creditCard({
-      where: { name_contains: name },
-    })
+    const creditCardExists = await prisma
+      .profile({ id: profileId })
+      .creditCard({
+        where: { name_contains: name },
+      })
 
     if (!creditCardExists.length) {
       return res.send({
@@ -118,11 +120,10 @@ const deposit = async (req, res) => {
     }
 
     const wallet = await prisma.profile({ id: profileId }).wallet()
-    console.log(wallet)
 
     const walletUpdated = await prisma.updateWallet({
       where: { id: wallet.id },
-      data: { credits: wallet.credits + value },
+      data: { credits: wallet.credits + parseInt(value) },
     })
 
     res.send(walletUpdated)
@@ -137,6 +138,7 @@ const withdraw = async (req, res) => {
     value,
     newBankAccount,
     owner,
+    ownerCpf,
     name,
     accountNumber,
     agencyNumber,
@@ -152,7 +154,7 @@ const withdraw = async (req, res) => {
     }
 
     if (newBankAccount) {
-      if (!owner || !name || !accountNumber || !agencyNumber || !bank) {
+      if (!owner || !name || !accountNumber || !agencyNumber || !bank || !ownerCpf) {
         return res.send({
           success: false,
           message: 'Os campos devem ser preenchidos!',
@@ -168,6 +170,16 @@ const withdraw = async (req, res) => {
           message: 'Já existe uma conta bancária nesse perfil',
         })
       }
+
+      const bankAccount = await prisma.createBankAccount({
+        accountNumber,
+        agencyNumber,
+        ownerCpf,
+        bank,
+        name,
+        ownerName: owner,
+        owner: { connect: { id: profileId } },
+      })
     } // fechou parte da nova conta bancária
 
     const bankAccountExists = await prisma
@@ -186,7 +198,7 @@ const withdraw = async (req, res) => {
 
     const walletUpdated = await prisma.updateWallet({
       where: { id: wallet.id },
-      data: { credits: wallet.credits - value },
+      data: { credits: wallet.credits - parseInt(value) },
     })
 
     res.send(walletUpdated)
