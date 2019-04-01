@@ -71,9 +71,9 @@ const deposit = async (req, res) => {
         })
       }
 
-      const creditCardExists = await prisma.creditCards({
-        where: { name_contains: name },
-      })
+      const creditCardExists = await prisma
+        .profile({ id: profileId })
+        .creditCard({ where: { name_contains: name } })
 
       if (creditCardExists.length) {
         res.send({
@@ -99,7 +99,7 @@ const deposit = async (req, res) => {
       })
     }
 
-    const creditCardExists = await prisma.creditCards({
+    const creditCardExists = await prisma.profile({ id: profileId }).creditCard({
       where: { name_contains: name },
     })
 
