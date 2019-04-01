@@ -47,6 +47,7 @@ type CreditCard {
   id: ID! @unique
   owner: Profile!
   number: String!
+  holder: String!
   expireDate: DateTime!
   securityCode: String!
   name: String!

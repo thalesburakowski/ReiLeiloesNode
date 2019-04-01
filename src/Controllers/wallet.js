@@ -12,6 +12,7 @@ const getWalletByProfileId = async (req, res) => {
 }
 
 const deposit = async (req, res) => {
+  console.log(req.body)
   const {
     profileId,
     value,
@@ -27,11 +28,11 @@ const deposit = async (req, res) => {
     if (value < 15) {
       return res.send({
         success: false,
-        message: 'O valor tem que ser maior do que zero',
+        message: 'O valor tem que ser maior ou igual a 15',
       })
     }
 
-    if (newBankAccount) {
+    if (newCreditCard) {
       if (!name) {
         res.send({ success: false, message: 'O nome deve ser preenchido!' })
       }
@@ -73,7 +74,7 @@ const deposit = async (req, res) => {
         where: { name_contains: name },
       })
 
-      if (creditCardExists) {
+      if (creditCardExists.length) {
         res.send({
           success: false,
           message: 'O nome deve ser unico!',
@@ -85,7 +86,8 @@ const deposit = async (req, res) => {
         expireDate,
         number,
         securityCode,
-        owner,
+        holder: owner,
+        owner: { connect: { id: profileId } },
       })
     } // fechou parte de novo cartão
 
@@ -100,7 +102,7 @@ const deposit = async (req, res) => {
       where: { name_contains: name },
     })
 
-    if (!creditCardExists) {
+    if (!creditCardExists.length) {
       return res.send({
         ssuccess: false,
         message: 'Não existe esse cartão de crédito',
@@ -159,7 +161,7 @@ const withdraw = async (req, res) => {
         .profile({ id: profileId })
         .bankAccount({ where: { name_contains: name } })
 
-      if (nameBankAccountExists) {
+      if (nameBankAccountExists.length) {
         return res.send({
           success: false,
           message: 'Já existe uma conta bancária com esse nome',
@@ -170,7 +172,7 @@ const withdraw = async (req, res) => {
         .profile({ id: profileId })
         .bankAccount({ where: { accountNumber_contains: accountNumber } })
 
-      if (accountNumberExists) {
+      if (accountNumberExists.length) {
         return res.send({
           success: false,
           message: 'Já existe uma conta bancária com esse número',
@@ -182,7 +184,7 @@ const withdraw = async (req, res) => {
       .profile({ id: profileId })
       .bankAccount({ where: { name_contains: name } })
 
-    if (nameBankAccountExists) {
+    if (nameBankAccountExists.length) {
       return res.send({
         success: false,
         message: 'Já existe uma conta bancária com esse nome',
@@ -193,7 +195,7 @@ const withdraw = async (req, res) => {
       .profile({ id: profileId })
       .bankAccount({ where: { accountNumber_contains: accountNumber } })
 
-    if (!accountNumberExists) {
+    if (!accountNumberExists.length) {
       return res.send({
         success: false,
         message: 'Não existe uma conta bancária com esse número',
