@@ -27,7 +27,7 @@ const deposit = async (req, res) => {
 
   try {
     if (value < 15) {
-      return res.send({
+      res.send({
         success: false,
         message: 'O valor tem que ser maior ou igual a 15',
       })
@@ -38,7 +38,7 @@ const deposit = async (req, res) => {
         res.send({ success: false, message: 'O nome deve ser preenchido!' })
       }
       if (!number) {
-        return res.send({
+        res.send({
           success: false,
           message: 'O número do cartão deve ser preenchido',
         })
@@ -100,7 +100,7 @@ const deposit = async (req, res) => {
     } // fechou parte de novo cartão
 
     if (!number) {
-      return res.send({
+      res.send({
         success: false,
         message: 'Nenhum cartão foi selecionado',
       })
@@ -113,18 +113,18 @@ const deposit = async (req, res) => {
       })
 
     if (!creditCardExists.length) {
-      return res.send({
+      res.send({
         ssuccess: false,
         message: 'Não existe esse cartão de crédito',
       })
     }
 
     if (new Date(creditCardExists[0].expireDate) < new Date()) {
-        res.send({
-          success: false,
-          message: 'Esse cartão está com a data expirada',
-        })
-      }
+      res.send({
+        success: false,
+        message: 'Esse cartão está com a data expirada',
+      })
+    }
     if (value > 3000) {
       res.send({
         success: false,
@@ -132,8 +132,6 @@ const deposit = async (req, res) => {
           'Você não possui esse valor na sua conta bancária, tente um valor menor!',
       })
     }
-
-    
 
     const wallet = await prisma.profile({ id: profileId }).wallet()
 
@@ -163,7 +161,7 @@ const withdraw = async (req, res) => {
 
   try {
     if (value <= 0) {
-      return res.send({
+      res.send({
         success: false,
         message: 'O valor tem que ser maior do que zero',
       })
@@ -178,7 +176,7 @@ const withdraw = async (req, res) => {
         !bank ||
         !ownerCpf
       ) {
-        return res.send({
+        res.send({
           success: false,
           message: 'Os campos devem ser preenchidos!',
         })
@@ -188,7 +186,7 @@ const withdraw = async (req, res) => {
         .bankAccount()
 
       if (bankAccountExists.length) {
-        return res.send({
+        res.send({
           success: false,
           message: 'Já existe uma conta bancária nesse perfil',
         })
@@ -211,7 +209,7 @@ const withdraw = async (req, res) => {
       .bankAccount({ where: { name_contains: name } })
 
     if (bankAccountExists.length) {
-      return res.send({
+      res.send({
         success: false,
         message: 'Já existe uma conta bancária com esse nome',
       })
@@ -220,7 +218,7 @@ const withdraw = async (req, res) => {
     const wallet = await prisma.profile({ id: profileId }).wallet()
     console.log(wallet)
     if (wallet.credits < value) {
-      return res.send({
+      res.send({
         success: false,
         message: 'Você não tem esse valor na sua conta',
       })
