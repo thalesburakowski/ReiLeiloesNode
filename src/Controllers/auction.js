@@ -48,6 +48,7 @@ const createAuction = async (req, res) => {
 			depth,
 			initialPrice,
 			closePrice,
+			status: 'created',
 			categories: {
 				connect: categories.map(category => {
 					return { id: category }
