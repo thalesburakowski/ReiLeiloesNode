@@ -8,5 +8,6 @@ require('../Routes/bankAccount')(app)
 require('../Routes/wallet')(app)
 require('../Routes/auction')(app)
 require('../Routes/category')(app)
+require('../Routes/auctionRequest')(app)
 
 module.exports = app
