@@ -18,12 +18,15 @@ const createAuction = async (req, res) => {
 		title,
 		categories,
 		description,
-		height,
-		width,
-		depth,
 		initialPrice,
 		closePrice,
 	} = req.body
+
+	let { height, width, depth } = req.body
+	height = parseFloat(height)
+	width = parseFloat(width)
+	depth = parseFloat(depth)
+	
 	try {
 		if (
 			!title ||
@@ -40,7 +43,7 @@ const createAuction = async (req, res) => {
 				message: 'Os campos obrigatórios devem ser preenchidos',
 			})
 		}
-		const auction = prisma.createAuction({
+		const auction = await prisma.createAuction({
 			title,
 			description,
 			height,
@@ -57,6 +60,20 @@ const createAuction = async (req, res) => {
 			owner: {
 				connect: { id: profileId },
 			},
+		})
+		console.log(auction)
+		return res.send(auction)
+	} catch (error) {
+		responsePrismaError(res, error)
+	}
+}
+
+const approveAuction = async (req, res) => {
+	const { auctionId } = req.body
+	try {
+		const auction = await prisma.updateAuction({
+			data: { status: 'approved' },
+			where: { id: auctionId },
 		})
 		console.log(auction)
 		return res.send(auction)
@@ -86,5 +103,6 @@ const bidAuction = async (req, res) => {
 module.exports = {
 	getAuction,
 	createAuction,
+	approveAuction,
 	bidAuction,
 }
