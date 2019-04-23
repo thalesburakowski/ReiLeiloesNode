@@ -4,6 +4,26 @@ const { responsePrismaError } = require('./utils')
 const getAuctions = async (req, res) => {
 	try {
 		const auctions = await prisma.auctions({ where: { status: 'created' } })
+
+		// const auctionsPromised = auctions.map(auction => {
+		// 	console.log('a')
+		// 	return async () => {
+		// 		console.log('auction')
+		// 		return prisma.auction({ id: auction.id })
+		// 	}
+		// })
+		// console.log(auctionsPromised)
+
+		// let result
+		// Promise.all(auctionsPromised).then(res => {
+		// 	console.log('entrou aqui')
+		// 	console.log(res)
+		// })
+
+		// auctions = await auctions.forEach(async auction => {
+		// 	return await prisma.auction({ id: auction.id }).owner()
+		// })
+
 		console.log(auctions)
 		res.send(auctions)
 	} catch (error) {
@@ -12,14 +32,23 @@ const getAuctions = async (req, res) => {
 }
 
 const approveAuction = async (req, res) => {
-	const { approved, auctionId } = req.body
+	const { approved, reason, auctionId } = req.body
 	try {
 		const auction = await prisma.updateAuction({
 			where: { id: auctionId },
 			data: { status: approved ? 'approved' : 'disapproved' },
 		})
-		console.log(auction)
-		res.send(auction)
+
+		const obj = {
+			approved,
+			auction: auction.id,
+		}
+
+		approved ? (obj.reason = reason) : ''
+
+		const auctionRequest = await prisma.createAuctionRequest(obj)
+		console.log(auctionRequest)
+		res.send(auctionRequest)
 	} catch (error) {
 		responsePrismaError(error)
 	}
