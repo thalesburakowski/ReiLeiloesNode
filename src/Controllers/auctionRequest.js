@@ -44,7 +44,7 @@ const approveAuction = async (req, res) => {
 			auction: { connect: { id: auctionId } },
 		}
 
-		approved ? (obj.reason = reason) : ''
+		!approved ? (obj.reason = reason) : ''
 
 		const auctionRequest = await prisma.createAuctionRequest(obj)
 		console.log(auctionRequest)
