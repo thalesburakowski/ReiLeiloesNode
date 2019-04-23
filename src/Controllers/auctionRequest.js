@@ -41,7 +41,7 @@ const approveAuction = async (req, res) => {
 
 		const obj = {
 			approved,
-			auction: auction.id,
+			auction: { connect: { id: auctionId } },
 		}
 
 		approved ? (obj.reason = reason) : ''
@@ -50,7 +50,7 @@ const approveAuction = async (req, res) => {
 		console.log(auctionRequest)
 		res.send(auctionRequest)
 	} catch (error) {
-		responsePrismaError(error)
+		responsePrismaError(res, error)
 	}
 }
 
