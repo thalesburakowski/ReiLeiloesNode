@@ -132,21 +132,6 @@ const bidAuction = async (req, res) => {
 const getApprovedAcutions = async (req, res) => {
 	try {
 		const auctions = await prisma.auctions({ where: { status: 'approved' } })
-		console.log(auctions.map(auction => auction.id))
-		const lastBids = await prisma.bids({
-			last: 1,
-			where: {
-				OR: auctions.map(auction => {
-					return { id: auction.id }
-				}),
-			},
-		})
-
-		console.log(lastBids)
-
-		// auctions.forEach((auction, index) => {
-		// 	auction.actualValue =
-		// })
 
 		res.send(auctions)
 	} catch (error) {
