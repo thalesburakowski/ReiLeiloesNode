@@ -6,7 +6,7 @@ const getAuction = async (req, res) => {
 	try {
 		const auction = await prisma.auction({ id: auctionId })
 		const categories = await prisma.auction({ id: auctionId }).categories()
-		res.send({ ...auction })
+		res.send({ ...auction, categories })
 	} catch (error) {
 		responsePrismaError(res, error)
 	}
