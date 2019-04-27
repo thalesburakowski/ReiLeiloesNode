@@ -94,7 +94,7 @@ type Auction {
   actualPrice: Float!
   closePrice: Float!
   finalPrice: Float
-  images: [String!] @scalarList(strategy: RELATION)
+  images: [String!]! @scalarList(strategy: RELATION)
   historic: [Bid!]
   status: String!
   initialDate: DateTime!
