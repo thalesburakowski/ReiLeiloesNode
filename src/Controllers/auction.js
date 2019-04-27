@@ -58,6 +58,8 @@ const createAuction = async (req, res) => {
 			width,
 			depth,
 			initialPrice,
+			actualPrice: initialPrice,
+			images,
 			closePrice,
 			initialDate,
 			closeDate,
@@ -102,9 +104,16 @@ const bidAuction = async (req, res) => {
 		})
 	}
 
-	const actualValue = await prisma.bids({ last: 1 })
+	const actualValue = await prisma.bids({
+		last: 1,
+		where: { auction: { id: auctionId } },
+	})
 
 	if (value > actualValue.value) {
+		const auction = await prisma.updateAuction({
+			where: { id: auctionId },
+			data: { actualPrice: value },
+		})
 		const bid = await prisma.createBid({
 			value,
 			auction: { connect: { id: auctionId } },
@@ -123,9 +132,25 @@ const bidAuction = async (req, res) => {
 const getApprovedAcutions = async (req, res) => {
 	try {
 		const auctions = await prisma.auctions({ where: { status: 'approved' } })
+		console.log(auctions.map(auction => auction.id))
+		const lastBids = await prisma.bids({
+			last: 1,
+			where: {
+				OR: auctions.map(auction => {
+					return { id: auction.id }
+				}),
+			},
+		})
+
+		console.log(lastBids)
+
+		// auctions.forEach((auction, index) => {
+		// 	auction.actualValue =
+		// })
+
 		res.send(auctions)
 	} catch (error) {
-
+		console.log(error)
 	}
 }
 
