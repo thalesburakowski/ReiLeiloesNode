@@ -21,13 +21,15 @@ const createAuction = async (req, res) => {
 		initialPrice,
 		closePrice,
 		initialDate,
-		finalDate,
+		closeDate,
 	} = req.body
 
 	let { height, width, depth } = req.body
 	height = parseFloat(height)
 	width = parseFloat(width)
 	depth = parseFloat(depth)
+
+	console.log(req.body)
 
 	try {
 		if (
@@ -47,6 +49,8 @@ const createAuction = async (req, res) => {
 				message: 'Os campos obrigatórios devem ser preenchidos',
 			})
 		}
+		console.log('teste 0123')
+
 		const auction = await prisma.createAuction({
 			title,
 			description,
@@ -56,7 +60,7 @@ const createAuction = async (req, res) => {
 			initialPrice,
 			closePrice,
 			initialDate,
-			finalDate,
+			closeDate,
 			status: 'created',
 			categories: {
 				connect: categories.map(category => {
@@ -70,6 +74,7 @@ const createAuction = async (req, res) => {
 		console.log(auction)
 		return res.send(auction)
 	} catch (error) {
+		console.log(error)
 		responsePrismaError(res, error)
 	}
 }
