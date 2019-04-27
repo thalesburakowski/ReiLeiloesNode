@@ -7,7 +7,7 @@ const getCategories = async (req, res) => {
 		console.log(categories)
 		res.send(categories)
 	} catch (error) {
-		responsePrismaError(error)
+		responsePrismaError(res, error)
 	}
 }
 

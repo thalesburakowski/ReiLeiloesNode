@@ -120,8 +120,18 @@ const bidAuction = async (req, res) => {
 	}
 }
 
+const getActiveAcutions = async (req, res) => {
+	try {
+		const auctions = await prisma.auctions({ where: { status: 'approved' } })
+		res.send(auctions)
+	} catch (error) {
+
+	}
+}
+
 module.exports = {
 	getAuction,
+	getApprovedAcutions,
 	createAuction,
 	approveAuction,
 	bidAuction,

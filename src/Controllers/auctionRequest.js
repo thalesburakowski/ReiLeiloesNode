@@ -28,7 +28,7 @@ const getAuctions = async (req, res) => {
 		console.log(auctions)
 		res.send(auctions)
 	} catch (error) {
-		responsePrismaError(error)
+		responsePrismaError(res, error)
 	}
 }
 
