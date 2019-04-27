@@ -16,6 +16,7 @@ const createAuction = async (req, res) => {
 	const {
 		profileId,
 		title,
+		images,
 		categories,
 		description,
 		initialPrice,
