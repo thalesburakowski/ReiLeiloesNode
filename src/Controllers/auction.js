@@ -120,7 +120,7 @@ const bidAuction = async (req, res) => {
 	}
 }
 
-const getActiveAcutions = async (req, res) => {
+const getApprovedAcutions = async (req, res) => {
 	try {
 		const auctions = await prisma.auctions({ where: { status: 'approved' } })
 		res.send(auctions)
