@@ -85,7 +85,7 @@ type Auction {
   owner: Profile! @relation(name: "Owner")
   winner: Profile @relation(name: "Win")
   title: String!
-  categories: [Category!]
+  categories: [Category!]!
   description: String!
   height: Float!
   width: Float!

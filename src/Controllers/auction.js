@@ -5,8 +5,8 @@ const getAuction = async (req, res) => {
 	const { auctionId } = req.params
 	try {
 		const auction = await prisma.auction({ id: auctionId })
-		console.log(auction)
-		res.send(auction)
+		const categories = await prisma.auction({ id: auctionId }).categories()
+		res.send({ ...auction })
 	} catch (error) {
 		responsePrismaError(res, error)
 	}
@@ -106,20 +106,23 @@ const bidAuction = async (req, res) => {
 		})
 	}
 
+	const auction = await prisma.auction({ id: auctionId })
+
 	const actualValue = await prisma.bids({
 		last: 1,
 		where: { auction: { id: auctionId } },
 	})
 
 	if (value > actualValue.value) {
-		const auction = await prisma.updateAuction({
-			where: { id: auctionId },
-			data: { actualPrice: value },
-		})
 		const bid = await prisma.createBid({
 			value,
 			auction: { connect: { id: auctionId } },
 			owner: { connect: { id: profileId } },
+		})
+
+		const auction = await prisma.updateAuction({
+			where: { id: auctionId },
+			data: { actualPrice: value },
 		})
 		console.log(bid)
 		return res.send(bid)
