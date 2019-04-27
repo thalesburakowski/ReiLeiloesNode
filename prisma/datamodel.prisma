@@ -1,16 +1,16 @@
 type User {
-  id: ID! @unique
+  id: ID! @id
   email: String! @unique
   password: String!
-  flgAdmin: Boolean! @default(value: "false")
-  active: Boolean! @default(value: "true")
-  profile: Profile
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  flgAdmin: Boolean! @default(value: false)
+  active: Boolean! @default(value: true)
+  profile: Profile @relation(link: INLINE)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type Profile {
-  id: ID! @unique
+  id: ID! @id
   owner: User!
   name: String!
   lastName: String!
@@ -18,18 +18,18 @@ type Profile {
   rg: String!
   birthDate: DateTime!
   nickName: String!
-  wallet: Wallet
+  wallet: Wallet @relation(link: INLINE)
   address: [Address!]
   creditCard: [CreditCard!]
   bankAccount: [BankAccount!]
-  selling: [Auction!] @relation(name: "Owner")
-  win: [Auction!] @relation(name: "Win")
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  selling: [Auction!] @relation(link: TABLE, name: "Owner")
+  win: [Auction!] @relation(link: TABLE, name: "Win")
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type Address {
-  id: ID! @unique
+  id: ID! @id
   owner: Profile!
   state: String!
   city: String!
@@ -39,26 +39,26 @@ type Address {
   number: String!
   complement: String!
   name: String!
-  active: Boolean! @default(value: "true")
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  active: Boolean! @default(value: true)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type CreditCard {
-  id: ID! @unique
+  id: ID! @id
   owner: Profile!
   number: String!
   holder: String!
   expireDate: DateTime!
   securityCode: String!
   name: String!
-  active: Boolean! @default(value: "true")
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  active: Boolean! @default(value: true)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type BankAccount {
-  id: ID! @unique
+  id: ID! @id
   owner: Profile!
   bank: String!
   accountNumber: String!
@@ -66,22 +66,22 @@ type BankAccount {
   ownerName: String!
   ownerCpf: String!
   name: String!
-  active: Boolean! @default(value: "true")
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  active: Boolean! @default(value: true)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type Wallet {
-  id: ID! @unique
+  id: ID! @id
   owner: Profile!
   credits: Float!
   pendingCredits: Float!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type Auction {
-  id: ID! @unique
+  id: ID! @id
   owner: Profile! @relation(name: "Owner")
   winner: Profile @relation(name: "Win")
   title: String!
@@ -95,41 +95,46 @@ type Auction {
   finalPrice: Float
   historic: [Bid!]
   status: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  initialDate: DateTime!
+  finalDate: DateTime
+  closeDate: DateTime!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type Category {
-  id: ID! @unique
+  id: ID! @id
   name: String!
   parentalRating: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type Bid {
-  id: ID! @unique
+  id: ID! @id
   owner: Profile!
   auction: Auction!
   value: Float!
-  show: Boolean! @default(value: "true")
-  createdAt: DateTime!
+  show: Boolean! @default(value: true)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type AuctionRequest {
-  id: ID! @unique
-  auction: Auction!
+  id: ID! @id
+  auction: Auction! @unique
   approved: Boolean!
   reason: String
-  createdAt: DateTime!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type AuctionCancellationRequest {
-  id: ID! @unique
+  id: ID! @id
   auction: Auction!
-  ownerProfile: Profile!
   reasonRequest: String!
   status: String!
   reasonResponse: String
-  createdAt: DateTime!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }

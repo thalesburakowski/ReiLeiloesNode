@@ -11,5 +11,7 @@ module.exports = app => {
   app.route('/profile/get-by-rg/:rg').get(profileControllers.getProfileByRg)
 
   app.route('/profile/get-by-nick/:nick').get(profileControllers.getProfileByNick)
+
+  app.route('/profile/get-historic/:profileId').get(profileControllers.getProfileByNick)
   // .delete(profileControllers.deleteprofile)
 }

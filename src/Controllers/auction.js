@@ -20,13 +20,15 @@ const createAuction = async (req, res) => {
 		description,
 		initialPrice,
 		closePrice,
+		initialDate,
+		finalDate,
 	} = req.body
 
 	let { height, width, depth } = req.body
 	height = parseFloat(height)
 	width = parseFloat(width)
 	depth = parseFloat(depth)
-	
+
 	try {
 		if (
 			!title ||
@@ -36,7 +38,9 @@ const createAuction = async (req, res) => {
 			!width ||
 			!depth ||
 			!initialPrice ||
-			!closePrice
+			!closePrice ||
+			!initialDate ||
+			!closeDate
 		) {
 			return res.send({
 				success: false,
@@ -51,6 +55,8 @@ const createAuction = async (req, res) => {
 			depth,
 			initialPrice,
 			closePrice,
+			initialDate,
+			finalDate,
 			status: 'created',
 			categories: {
 				connect: categories.map(category => {
@@ -91,13 +97,22 @@ const bidAuction = async (req, res) => {
 		})
 	}
 
-	const bid = await prisma.createBid({
-		value,
-		auction: { connect: { id: auctionId } },
-		owner: { connect: { id: profileId } },
-	})
-	console.log(bid)
-	return res.send(bid)
+	const actualValue = await prisma.bids({ last: 1 })
+
+	if (value > actualValue.value) {
+		const bid = await prisma.createBid({
+			value,
+			auction: { connect: { id: auctionId } },
+			owner: { connect: { id: profileId } },
+		})
+		console.log(bid)
+		return res.send(bid)
+	} else {
+		return res.send({
+			success: false,
+			message: 'O valor deve ser preenchido',
+		})
+	}
 }
 
 module.exports = {

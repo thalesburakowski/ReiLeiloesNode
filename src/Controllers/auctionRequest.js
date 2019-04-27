@@ -4,6 +4,7 @@ const { responsePrismaError } = require('./utils')
 const getAuctions = async (req, res) => {
 	try {
 		const auctions = await prisma.auctions({ where: { status: 'created' } })
+		console.log(auctions)
 
 		// const auctionsPromised = auctions.map(auction => {
 		// 	console.log('a')
