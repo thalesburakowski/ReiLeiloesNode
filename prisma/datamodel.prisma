@@ -100,6 +100,7 @@ type Auction {
   initialDate: DateTime!
   finalDate: DateTime
   closeDate: DateTime!
+  address: Address
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
 }

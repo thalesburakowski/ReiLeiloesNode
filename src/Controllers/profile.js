@@ -89,8 +89,15 @@ getHistoric = async (req, res) => {
 	const { profileId } = req.params
 
 	try {
-    const historic = await prisma.bids({ where: { owner: { id: profileId } } })
-    // tem que continuar pra montar o objeto daora
+		// const historic = await prisma.bids({ where: { owner: { id: profileId } } })
+		const historic = await prisma.auctions({
+			where: { winner: { id: profileId } },
+		})
+		consoel.log(
+			await prisma.auctions({ where: { historic_some: { owner: profileId } } })
+		)
+
+		// tem que continuar pra montar o objeto daora
 		res.json(historic)
 	} catch (error) {}
 }

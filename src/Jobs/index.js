@@ -21,7 +21,6 @@ const scheduleJobsActive = async () => {
 }
 
 const scheduleJobsFinalize = async () => {
-	console.log('finalize')
 	try {
 		const auctions = await prisma.auctions({ where: { status: 'active' } })
 		auctions.forEach(auction => {
@@ -30,9 +29,11 @@ const scheduleJobsFinalize = async () => {
 			const job = schedule.scheduleJob(date, async () => {
 				await prisma.updateAuction({
 					where: { id: auction.id },
-					data: { status: 'finalize' },
+					data: { status: 'finalized' },
 				})
 			})
+
+
 		})
 	} catch (error) {
 		console.log(error)

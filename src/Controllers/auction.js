@@ -1,5 +1,6 @@
 const { prisma } = require('../../generated/prisma-client')
 const { responsePrismaError } = require('./utils')
+const schedule = require('node-schedule')
 
 const getAuction = async (req, res) => {
 	const { auctionId } = req.params
@@ -74,6 +75,20 @@ const createAuction = async (req, res) => {
 			owner: {
 				connect: { id: profileId },
 			},
+		})
+
+		const jobActivate = schedule.scheduleJob(date, async () => {
+			await prisma.updateAuction({
+				where: { id: auction.id },
+				data: { status: 'active' },
+			})
+		})
+
+		const jobFinalize = schedule.scheduleJob(date, async () => {
+			await prisma.updateAuction({
+				where: { id: auction.id },
+				data: { status: 'finalized' },
+			})
 		})
 		console.log(auction)
 		return res.send(auction)
