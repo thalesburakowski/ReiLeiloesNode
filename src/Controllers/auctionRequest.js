@@ -41,7 +41,7 @@ const approveAuction = async (req, res) => {
 			data: { status: approved ? 'approved' : 'disapproved' },
 		})
 
-		if(auction.status == 'approved'){
+		if (auction.status == 'approved') {
 			const initialActiveDate = new Date(auction.initialDate)
 			const jobActivate = schedule.scheduleJob(initialActiveDate, async () => {
 				await prisma.updateAuction({

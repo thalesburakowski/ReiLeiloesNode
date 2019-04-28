@@ -130,7 +130,6 @@ const bidAuction = async (req, res) => {
 
 		if (value >= auction.closePrice) {
 			//congelar valor do cara atual
-
 		} else {
 			bid = await prisma.createBid({
 				value,
@@ -159,7 +158,9 @@ const bidAuction = async (req, res) => {
 
 const getApprovedAcutions = async (req, res) => {
 	try {
-		const auctions = await prisma.auctions({ where: { status: 'approved' } })
+		const auctions = await prisma.auctions({
+			where: { OR: [{ status: 'approved' }, { status: 'active' }] },
+		})
 
 		res.send(auctions)
 	} catch (error) {
