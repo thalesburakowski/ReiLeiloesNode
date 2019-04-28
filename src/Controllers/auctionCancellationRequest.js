@@ -5,7 +5,7 @@ const getAuctionCancellationRequests = async (req, res) => {
 	try {
 		const query = `
 		query {
-			auctionCancellationRequests(where:{status: "created"}) {
+			auctionCancellationRequests(where:{status: "finalized"}) {
 				reasonRequest,
 				auction {
 					title,
