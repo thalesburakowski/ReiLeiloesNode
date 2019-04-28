@@ -77,14 +77,18 @@ const createAuction = async (req, res) => {
 			},
 		})
 
-		const jobActivate = schedule.scheduleJob(date, async () => {
+		const initialActiveDate = new Date(initialDate)
+
+		const jobActivate = schedule.scheduleJob(initialActiveDate, async () => {
 			await prisma.updateAuction({
 				where: { id: auction.id },
 				data: { status: 'active' },
 			})
 		})
 
-		const jobFinalize = schedule.scheduleJob(date, async () => {
+		const closeFinalizedDate = new Date(closeDate)
+
+		const jobFinalize = schedule.scheduleJob(closeFinalizedDate, async () => {
 			await prisma.updateAuction({
 				where: { id: auction.id },
 				data: { status: 'finalized' },
@@ -152,9 +156,24 @@ const getApprovedAcutions = async (req, res) => {
 	}
 }
 
+const deliveryAuction = async (req, res) => {
+	const { auctionId, addressId } = req.body
+	try {
+		const auction = await prisma.updateAuction({
+			where: { id: auctionId },
+			data: { address: { connect: { id: addressId } } },
+		})
+		res.send(auction)
+	} catch (error) {
+		responsePrismaError(res, error)
+	}
+}
+// delivering
+
 module.exports = {
 	getAuction,
 	getApprovedAcutions,
 	createAuction,
 	bidAuction,
+	deliveryAuction
 }
