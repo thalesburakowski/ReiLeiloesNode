@@ -77,14 +77,14 @@ const createAuction = async (req, res) => {
 			},
 		})
 
-		const initialActiveDate = new Date(initialDate)
+		// const initialActiveDate = new Date(initialDate)
 
-		const jobActivate = schedule.scheduleJob(initialActiveDate, async () => {
-			await prisma.updateAuction({
-				where: { id: auction.id },
-				data: { status: 'active' },
-			})
-		})
+		// const jobActivate = schedule.scheduleJob(initialActiveDate, async () => {
+		// 	await prisma.updateAuction({
+		// 		where: { id: auction.id },
+		// 		data: { status: 'active' },
+		// 	})
+		// })
 
 		const closeFinalizedDate = new Date(closeDate)
 
@@ -126,16 +126,27 @@ const bidAuction = async (req, res) => {
 	})
 
 	if (value > actualValue.value) {
-		const bid = await prisma.createBid({
-			value,
-			auction: { connect: { id: auctionId } },
-			owner: { connect: { id: profileId } },
-		})
+		let bid
 
-		const auction = await prisma.updateAuction({
-			where: { id: auctionId },
-			data: { actualPrice: value },
-		})
+		if (value >= auction.closePrice) {
+			//congelar valor do cara atual
+
+		} else {
+			bid = await prisma.createBid({
+				value,
+				auction: { connect: { id: auctionId } },
+				owner: { connect: { id: profileId } },
+			})
+
+			actualValue
+
+			// descongelar o valor de volta pro ultimo cara que fez o pedido
+			const auction = await prisma.updateAuction({
+				where: { id: auctionId },
+				data: { actualPrice: value },
+			})
+		}
+
 		console.log(bid)
 		return res.send(bid)
 	} else {
@@ -175,5 +186,5 @@ module.exports = {
 	getApprovedAcutions,
 	createAuction,
 	bidAuction,
-	deliveryAuction
+	deliveryAuction,
 }
