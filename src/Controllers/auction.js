@@ -157,7 +157,9 @@ const bidAuction = async (req, res) => {
 			} else {
 				// descongelar o valor de volta pro ultimo cara que fez o pedido
 				console.log(lastOwner)
-				const wallet = await prisma.profile({ id: lastOwner[0].owner.id }).wallet()
+				const wallet = await prisma
+					.profile({ id: lastOwner[0].owner.id })
+					.wallet()
 				await prisma.updateWallet({
 					where: { id: wallet.id },
 					data: { credits: wallet.credits + auctionLastTime.actualPrice },
@@ -172,6 +174,16 @@ const bidAuction = async (req, res) => {
 				message: 'O valor deve ser maior do que o antigo',
 			})
 		}
+	} catch (error) {
+		responsePrismaError(res, error)
+	}
+}
+
+const getHistoricBids = async (req, res) => {
+	const { auctionId } = req.params
+	try {
+		const historic = await prisma.auction({ id: auctionId }).historic()
+		res.send(historic)
 	} catch (error) {
 		responsePrismaError(res, error)
 	}
@@ -201,7 +213,6 @@ const deliveryAuction = async (req, res) => {
 		responsePrismaError(res, error)
 	}
 }
-// delivering
 
 module.exports = {
 	getAuction,
@@ -209,4 +220,5 @@ module.exports = {
 	createAuction,
 	bidAuction,
 	deliveryAuction,
+	getHistoricBids
 }
