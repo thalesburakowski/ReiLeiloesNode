@@ -125,24 +125,40 @@ const bidAuction = async (req, res) => {
 		where: { auction: { id: auctionId } },
 	})
 
+	const lastOwner = await prisma
+		.bids({
+			last: 1,
+			where: { auction: { id: auctionId } },
+		})
+		.owner()
+
 	if (value > actualValue.value) {
-		let bid
+		const bid = await prisma.createBid({
+			value,
+			auction: { connect: { id: auctionId } },
+			owner: { connect: { id: profileId } },
+		})
 
+		const auction = await prisma.updateAuction({
+			where: { id: auctionId },
+			data: { actualPrice: value },
+		})
+		
 		if (value >= auction.closePrice) {
-			//congelar valor do cara atual
-		} else {
-			bid = await prisma.createBid({
-				value,
-				auction: { connect: { id: auctionId } },
-				owner: { connect: { id: profileId } },
+			// Leilão finalizado
+			const walletWinner = await prisma.profile({ id: profileId }).wallet()
+			const wallet = await prisma.updateWallet({
+				where: { id: walletWinner.id },
+				data: { credits: walletWinner.credits - value },
 			})
-
-			actualValue
+			const auction = await prisma.updateAuction({where: {id: auctionId}, data: {status: 'finalized'}})
+		} else {
 
 			// descongelar o valor de volta pro ultimo cara que fez o pedido
-			const auction = await prisma.updateAuction({
-				where: { id: auctionId },
-				data: { actualPrice: value },
+			const wallet = await prisma.profile({ id: lastOwner.id }).wallet()
+			await prisma.updateWallet({
+				where: { id: wallet.id },
+				data: { credits: wallet.credits + actualValue },
 			})
 		}
 
