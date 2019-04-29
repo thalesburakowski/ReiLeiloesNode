@@ -8,4 +8,8 @@ module.exports = app => {
 	app
 		.route('/leilao-pendente-cancelamento')
 		.post(auctionControllers.approveAuction)
+
+	app
+		.route('/leilao-criar-cancelamento')
+		.post(auctionControllers.makeCancelationRequest)
 }

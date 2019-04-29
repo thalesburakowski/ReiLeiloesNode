@@ -27,13 +27,15 @@ const scheduleJobsFinalize = async () => {
 			const date = new Date(auction.closeDate)
 
 			const job = schedule.scheduleJob(date, async () => {
+				const winner = await prisma
+					.auction({ id: auction.id })
+					.historic({ last: 1 })
+
 				await prisma.updateAuction({
 					where: { id: auction.id },
-					data: { status: 'finalized' },
+					data: { status: 'finalized', winner: { connect: winner[0].id } },
 				})
 			})
-
-
 		})
 	} catch (error) {
 		console.log(error)

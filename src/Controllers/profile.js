@@ -92,14 +92,17 @@ getHistoric = async (req, res) => {
 		// const historic = await prisma.bids({ where: { owner: { id: profileId } } })
 		const historic = await prisma.auctions({
 			where: { winner: { id: profileId } },
-		})
-		consoel.log(
-			await prisma.auctions({ where: { historic_some: { owner: profileId } } })
-		)
+		})	
+		// consoel.log(
+		// 	await prisma.auctions({ where: { historic_some: { owner: profileId } } })
+		// )
 
 		// tem que continuar pra montar o objeto daora
 		res.json(historic)
-	} catch (error) {}
+	} catch (error) {
+		responsePrismaError(res, error)
+
+	}
 }
 
 module.exports = {
@@ -108,4 +111,5 @@ module.exports = {
 	getProfileByCpf,
 	getProfileByRg,
 	getProfileByNick,
+	getHistoric
 }

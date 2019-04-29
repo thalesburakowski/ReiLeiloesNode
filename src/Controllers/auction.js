@@ -141,22 +141,20 @@ const bidAuction = async (req, res) => {
 				where: { id: auctionId },
 				data: { actualPrice: value },
 			})
+			const walletWinner = await prisma.profile({ id: profileId }).wallet()
+			const wallet = await prisma.updateWallet({
+				where: { id: walletWinner.id },
+				data: { credits: walletWinner.credits - value },
+			})
 
 			if (value >= auction.closePrice) {
 				// Leilão finalizado
-				const walletWinner = await prisma.profile({ id: profileId }).wallet()
-				const wallet = await prisma.updateWallet({
-					where: { id: walletWinner.id },
-					data: { credits: walletWinner.credits - value },
-				})
-
 				const auction = await prisma.updateAuction({
 					where: { id: auctionId },
-					data: { status: 'finalized' },
+					data: { status: 'finalized', winner: { connect: { id: profileId } } },
 				})
 			} else {
 				// descongelar o valor de volta pro ultimo cara que fez o pedido
-				console.log(lastOwner)
 				const wallet = await prisma
 					.profile({ id: lastOwner[0].owner.id })
 					.wallet()
@@ -182,8 +180,41 @@ const bidAuction = async (req, res) => {
 const getHistoricBids = async (req, res) => {
 	const { auctionId } = req.params
 	try {
-		const historic = await prisma.auction({ id: auctionId }).historic()
-		res.send(historic)
+		// const historic = await prisma.auction({ id: auctionId }).historic()
+		const query = `
+		query {
+			auction(where:{id: "${auctionId}"}){
+				historic {
+					value
+					owner {
+						nickName
+						id
+					}
+				}
+			}
+		}
+		`
+		const auctions = await prisma.$graphql(query)
+		// historic = auction.historic
+		const bids = auctions.auction.historic
+
+		// console.log(bid.owner.id)
+		// console.log(bid.value)
+		const response = bids.map(bid => {
+			return {
+				username: bid.owner.nickName,
+				usernameId: bid.owner.id,
+				price: bid.value,
+			}
+		})
+		console.log(response)
+		// { id: 1, username: '@mariazinha', price: 'R$ 150,00' },
+		// const response = historic.map(history => {
+		// 	const obj = {
+		// 		username:
+		// 	}
+		// })
+		res.send(response)
 	} catch (error) {
 		responsePrismaError(res, error)
 	}
@@ -220,5 +251,5 @@ module.exports = {
 	createAuction,
 	bidAuction,
 	deliveryAuction,
-	getHistoricBids
+	getHistoricBids,
 }
