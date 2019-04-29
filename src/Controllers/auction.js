@@ -104,71 +104,76 @@ const createAuction = async (req, res) => {
 
 const bidAuction = async (req, res) => {
 	const { value, profileId, auctionId } = req.body
-	if (!value) {
-		return res.send({
-			success: false,
-			message: 'O valor deve ser preenchido',
-		})
-	}
-
-	const auction = await prisma.auction({ id: auctionId })
-	if (auction.status != 'active') {
-		return res.send({
-			success: false,
-			message:
-				'Essa ação não pode ser realizada enquanto o leilão não estiver ativo!',
-		})
-	}
-
-	const actualValue = await prisma.bids({
-		last: 1,
-		where: { auction: { id: auctionId } },
-	})
-
-	const lastOwner = await prisma
-		.bids({
-			last: 1,
-			where: { auction: { id: auctionId } },
-		})
-		.owner()
-
-	if (value > actualValue.value) {
-		const bid = await prisma.createBid({
-			value,
-			auction: { connect: { id: auctionId } },
-			owner: { connect: { id: profileId } },
-		})
-
-		const auction = await prisma.updateAuction({
-			where: { id: auctionId },
-			data: { actualPrice: value },
-		})
-		
-		if (value >= auction.closePrice) {
-			// Leilão finalizado
-			const walletWinner = await prisma.profile({ id: profileId }).wallet()
-			const wallet = await prisma.updateWallet({
-				where: { id: walletWinner.id },
-				data: { credits: walletWinner.credits - value },
-			})
-			const auction = await prisma.updateAuction({where: {id: auctionId}, data: {status: 'finalized'}})
-		} else {
-
-			// descongelar o valor de volta pro ultimo cara que fez o pedido
-			const wallet = await prisma.profile({ id: lastOwner.id }).wallet()
-			await prisma.updateWallet({
-				where: { id: wallet.id },
-				data: { credits: wallet.credits + actualValue },
+	try {
+		if (!value) {
+			return res.send({
+				success: false,
+				message: 'O valor deve ser preenchido',
 			})
 		}
 
-		console.log(bid)
-		return res.send(bid)
-	} else {
-		return res.send({
-			success: false,
-			message: 'O valor deve ser preenchido',
-		})
+		const auctionLastTime = await prisma.auction({ id: auctionId })
+		if (auctionLastTime.status != 'active') {
+			return res.send({
+				success: false,
+				message:
+					'Essa ação não pode ser realizada enquanto o leilão não estiver ativo!',
+			})
+		}
+
+		const lastOwner = await prisma
+			.bids({
+				last: 1,
+				where: { auction: { id: auctionId } },
+			})
+			.owner()
+
+		// console.log(actualValue.length)
+
+		if (value > auctionLastTime.actualPrice) {
+			const bid = await prisma.createBid({
+				value,
+				auction: { connect: { id: auctionId } },
+				owner: { connect: { id: profileId } },
+			})
+
+			const auction = await prisma.updateAuction({
+				where: { id: auctionId },
+				data: { actualPrice: value },
+			})
+
+			if (value >= auction.closePrice) {
+				// Leilão finalizado
+				const walletWinner = await prisma.profile({ id: profileId }).wallet()
+				const wallet = await prisma.updateWallet({
+					where: { id: walletWinner.id },
+					data: { credits: walletWinner.credits - value },
+				})
+
+				const auction = await prisma.updateAuction({
+					where: { id: auctionId },
+					data: { status: 'finalized' },
+				})
+			} else {
+				// descongelar o valor de volta pro ultimo cara que fez o pedido
+				console.log(lastOwner)
+				const wallet = await prisma.profile({ id: lastOwner[0].owner.id }).wallet()
+				await prisma.updateWallet({
+					where: { id: wallet.id },
+					data: { credits: wallet.credits + auctionLastTime.actualPrice },
+				})
+			}
+
+			console.log(bid)
+			return res.send(bid)
+		} else {
+			return res.send({
+				success: false,
+				message: 'O valor deve ser maior do que o antigo',
+			})
+		}
+	} catch (error) {
+		responsePrismaError(res, error)
 	}
 }
 
