@@ -33,20 +33,38 @@ const makeCancelationRequest = async (req, res) => {
 			data: { status: 'cancelation-request' },
 		})
 
-		const AuctionCancellationRequest = await prisma.createAuctionCancellationRequest(
+		const auctionCancellationRequest = await prisma.createAuctionCancellationRequest(
 			{
 				status: true,
 				reasonRequest: reason,
 				auction: { connect: { id: profileId } },
 			}
 		)
-		res.send(AuctionCancellationRequest)
+		res.send(auctionCancellationRequest)
 	} catch (error) {
 		responsePrismaError(res, error)
 	}
 }
 
-const approveAuction = async (req, res) => {}
+const approveAuction = async (req, res) => {
+	const { reasonResponse, status, auctionCancellationId } = req.body
+	try {
+		
+		const auctionCancellationRequest = await prisma.updateAuctionCancellationRequest({
+			data: { reasonResponse, status },
+			where: { id: auctionCancellationId },
+		})
+		const auction = await prisma.updateAuction({
+			data: { status: 'finalized' },
+			where: { id: auction.id },
+		})
+		res.send(AuctionCancellationRequest)
+		
+	} catch (error) {
+		responsePrismaError(res, error)		
+	}
+
+}
 
 module.exports = {
 	getAuctionCancellationRequests,
