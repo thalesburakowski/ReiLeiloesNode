@@ -28,7 +28,7 @@ const getAuctionCancellationRequests = async (req, res) => {
 }
 
 const makeCancelationRequest = async (req, res) => {
-	const { profileId, auctionId, reason } = req.body
+	const { auctionId, reason } = req.body
 	try {
 		const auction = await prisma.updateAuction({
 			where: { id: auctionId },
@@ -39,7 +39,7 @@ const makeCancelationRequest = async (req, res) => {
 			{
 				active: true,
 				reasonRequest: reason,
-				auction: { connect: { id: profileId } },
+				auction: { connect: { id: auctionId } },
 			}
 		)
 		res.send(auctionCancellationRequest)
@@ -61,6 +61,29 @@ const approveAuctionCancellation = async (req, res) => {
 			data: { status: 'finalized' },
 			where: { id: auction.id },
 		})
+
+		const walletSeller = await prisma
+			.auction({ id: auction.id })
+			.owner()
+			.wallet()
+
+		const walletWinner = await prisma
+			.auction({ id: auction.id })
+			.winner()
+			.wallet()
+
+		const walletWinnerAtualized = await prisma.updateWallet({
+			where: { id: walletWinner.id },
+			data: {
+				pendingCredits: walletWinner.pendingCredits + auction.finalPrice,
+			},
+		})
+
+		const walletSellerAtualized = await prisma.updateWallet({
+			where: { id: walletSeller.id },
+			data: { credits: walletSeller.credits - auction.finalPrice },
+		})
+
 		res.send(AuctionCancellationRequest)
 	} catch (error) {
 		responsePrismaError(res, error)
@@ -81,6 +104,7 @@ const makeAnnulmentRequest = async (req, res) => {
 			data: { status: 'annulment-request' },
 			where: { id: auctionId },
 		})
+		res.send(auctionAnnulmentRequest)
 	} catch (error) {
 		responsePrismaError(res, error)
 	}
@@ -92,13 +116,15 @@ const approveAuctionAnnulment = async (req, res) => {
 		const auctionAnnullmentRequest = await prisma.updateAuctionAnnulmentRequest(
 			{
 				data: { reasonResponse, status },
-				where: { id: auctionCancellationId },
+				where: { id: auctionAnnulmentId },
 			}
 		)
+
 		const auction = await prisma.updateAuction({
 			data: { status: 'finalized' },
 			where: { id: auction.id },
 		})
+
 		res.send(AuctionCancellationRequest)
 	} catch (error) {
 		responsePrismaError(res, error)
@@ -109,7 +135,7 @@ const getAuctionAnnulmentRequests = async (req, res) => {
 	try {
 		const query = `
 			query {
-				auctionCancellationRequests(where:{status: true}) {
+				auctionCancellationRequests(where:{active: true}) {
 					reasonRequest,
 					auction {
 						title,
