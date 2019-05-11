@@ -136,7 +136,8 @@ type AuctionCancellationRequest {
   id: ID! @id
   auction: Auction!
   reasonRequest: String!
-  status: Boolean!
+  status: Boolean
+  active: Boolean!
   reasonResponse: String
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
@@ -146,7 +147,8 @@ type AuctionAnnulmentRequest {
   id: ID! @id
   auction: Auction!
   reasonRequest: String!
-  status: Boolean!
+  status: Boolean
+  active: Boolean!
   reasonResponse: String
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt

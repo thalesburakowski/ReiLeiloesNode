@@ -5,7 +5,7 @@ const getAuctionCancellationRequests = async (req, res) => {
 	try {
 		const query = `
 		query {
-			auctionCancellationRequests(where:{status: true}) {
+			auctionCancellationRequests(where:{active: true}) {
 				reasonRequest,
 				auction {
 					title,
@@ -37,7 +37,7 @@ const makeCancelationRequest = async (req, res) => {
 
 		const auctionCancellationRequest = await prisma.createAuctionCancellationRequest(
 			{
-				status: true,
+				active: true,
 				reasonRequest: reason,
 				auction: { connect: { id: profileId } },
 			}
@@ -53,7 +53,7 @@ const approveAuctionCancellation = async (req, res) => {
 	try {
 		const auctionCancellationRequest = await prisma.updateAuctionCancellationRequest(
 			{
-				data: { reasonResponse, status },
+				data: { reasonResponse, status, active: false },
 				where: { id: auctionCancellationId },
 			}
 		)
@@ -74,7 +74,7 @@ const makeAnnulmentRequest = async (req, res) => {
 		const auctionAnnulmentRequest = await prisma.createAuctionAnnulmentRequest({
 			auction: { connect: { id: auctionId } },
 			reasonRequest: reason,
-			status: true,
+			active: true,
 		})
 
 		const auction = await prisma.updateAuction({
