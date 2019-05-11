@@ -164,7 +164,6 @@ const bidAuction = async (req, res) => {
 				})
 			}
 
-			console.log(bid)
 			return res.send(bid)
 		} else {
 			return res.send({
@@ -214,7 +213,7 @@ const getHistoricBids = async (req, res) => {
 		// 		username:
 		// 	}
 		// })
-		res.send(response)
+		return res.send(response)
 	} catch (error) {
 		responsePrismaError(res, error)
 	}
@@ -226,7 +225,7 @@ const getApprovedAcutions = async (req, res) => {
 			where: { OR: [{ status: 'approved' }, { status: 'active' }] },
 		})
 
-		res.send(auctions)
+		return res.send(auctions)
 	} catch (error) {
 		console.log(error)
 	}
@@ -239,7 +238,7 @@ const deliveryAuction = async (req, res) => {
 			where: { id: auctionId },
 			data: { address: { connect: { id: addressId } } },
 		})
-		res.send(auction)
+		return res.send(auction)
 	} catch (error) {
 		responsePrismaError(res, error)
 	}

@@ -92,7 +92,7 @@ getHistoric = async (req, res) => {
 		// const historic = await prisma.bids({ where: { owner: { id: profileId } } })
 		const historic = await prisma.auctions({
 			where: { winner: { id: profileId } },
-		})	
+		})
 		// consoel.log(
 		// 	await prisma.auctions({ where: { historic_some: { owner: profileId } } })
 		// )
@@ -101,7 +101,25 @@ getHistoric = async (req, res) => {
 		res.json(historic)
 	} catch (error) {
 		responsePrismaError(res, error)
+	}
+}
 
+deleteHistoric = async (req, res) => {
+	const { auctionId } = req.body
+
+	try {
+		const lastBid = await prisma.bids({
+			last: 1,
+			where: { auction: { id: auctionId } },
+		})
+		const bid = await prisma.updateBid({
+			where: { id: lastBid.id },
+			data: { show: false },
+		})
+
+		res.json(bid)
+	} catch (error) {
+		responsePrismaError(res, error)
 	}
 }
 
@@ -111,5 +129,5 @@ module.exports = {
 	getProfileByCpf,
 	getProfileByRg,
 	getProfileByNick,
-	getHistoric
+	getHistoric,
 }

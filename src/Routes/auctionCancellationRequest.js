@@ -6,8 +6,12 @@ module.exports = app => {
 		.get(auctionControllers.getAuctionCancellationRequests)
 
 	app
+		.route('/leilao-pendente-anulamento')
+		.get(auctionControllers.getAuctionAnullmentRequests)
+
+	app
 		.route('/leilao-pendente-cancelamento')
-		.post(auctionControllers.approveAuction)
+		.post(auctionControllers.approveAuctionCancellation)
 
 	app
 		.route('/leilao-criar-cancelamento')
