@@ -130,4 +130,5 @@ module.exports = {
 	getProfileByRg,
 	getProfileByNick,
 	getHistoric,
+	deleteHistoric
 }
