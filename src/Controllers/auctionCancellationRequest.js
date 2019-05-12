@@ -7,13 +7,17 @@ const getAuctionCancellationRequests = async (req, res) => {
 		query {
 			auctionCancellationRequests(where:{active: true}) {
 				reasonRequest,
+				id
 				auction {
+					id
 					title,
 					actualPrice,
 					owner {
+						id
 						name
 					},
 					winner {
+						id
 						name
 					}
 				},
@@ -57,6 +61,7 @@ const approveAuctionCancellation = async (req, res) => {
 				where: { id: auctionCancellationId },
 			}
 		)
+
 		const auction = await prisma.updateAuction({
 			data: { status: status ? 'annuled' : 'annulmentRejected' },
 			where: { id: auction.id },
