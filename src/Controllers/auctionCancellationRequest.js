@@ -118,7 +118,7 @@ const makeAnnulmentRequest = async (req, res) => {
 		})
 
 		const auctionUpdated = await prisma.updateAuction({
-			data: { status: 'annulment' },
+			data: { status: 'canceled' },
 			where: { id: auctionId },
 		})
 
