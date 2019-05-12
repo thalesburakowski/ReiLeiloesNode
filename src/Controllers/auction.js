@@ -24,14 +24,12 @@ const createAuction = async (req, res) => {
 		closePrice,
 		initialDate,
 		closeDate,
-	} = req.body
+	} = req.body.auctionData
 
 	let { height, width, depth } = req.body
 	height = parseFloat(height)
 	width = parseFloat(width)
 	depth = parseFloat(depth)
-
-	console.log(req.body)
 
 	try {
 		if (
@@ -52,7 +50,6 @@ const createAuction = async (req, res) => {
 				message: 'Os campos obrigatórios devem ser preenchidos',
 			})
 		}
-		console.log(images)
 
 		const auction = await prisma.createAuction({
 			title,
@@ -94,7 +91,6 @@ const createAuction = async (req, res) => {
 				data: { status: 'finalized' },
 			})
 		})
-		console.log(auction)
 		return res.send(auction)
 	} catch (error) {
 		console.log(error)
@@ -127,8 +123,6 @@ const bidAuction = async (req, res) => {
 				where: { auction: { id: auctionId } },
 			})
 			.owner()
-
-		// console.log(actualValue.length)
 
 		if (value > auctionLastTime.actualPrice) {
 			const bid = await prisma.createBid({
@@ -197,8 +191,6 @@ const getHistoricBids = async (req, res) => {
 		// historic = auction.historic
 		const bids = auctions.auction.historic
 
-		// console.log(bid.owner.id)
-		// console.log(bid.value)
 		const response = bids.map(bid => {
 			return {
 				username: bid.owner.nickName,
@@ -206,7 +198,6 @@ const getHistoricBids = async (req, res) => {
 				price: bid.value,
 			}
 		})
-		console.log(response)
 		// { id: 1, username: '@mariazinha', price: 'R$ 150,00' },
 		// const response = historic.map(history => {
 		// 	const obj = {
@@ -220,6 +211,16 @@ const getHistoricBids = async (req, res) => {
 }
 
 const getApprovedAcutions = async (req, res) => {
+	// const { params } = req.query
+
+	// const categories = params.split(',').map(category => {
+	// 	return {
+
+	// 	}
+	// })
+
+	// const query = [{ status: 'approved' }, { status: 'active' }, { }]
+
 	try {
 		const auctions = await prisma.auctions({
 			where: { OR: [{ status: 'approved' }, { status: 'active' }] },
@@ -280,5 +281,5 @@ module.exports = {
 	addAddressToAuction,
 	getHistoricBids,
 	deliveringAuction,
-	receivingAuction
+	receivingAuction,
 }
