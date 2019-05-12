@@ -3,17 +3,17 @@ const auctionControllers = require('../Controllers/auctionCancellationRequest')
 module.exports = app => {
 	app
 		.route('/leilao-pendente-anulamento')
-		.get(auctionControllers.getAuctionCancellationRequests)
+		.get(auctionControllers.getAuctionAnnulmentRequests)
 
 	app
 		.route('/leilao-pendente-anulamento')
-		.post(auctionControllers.approveAuctionCancellation)
+		.post(auctionControllers.approveAuctionAnnulment)
 
 	app
 		.route('/leilao-criar-anulamento')
-		.post(auctionControllers.makeCancelationRequest)
+		.post(auctionControllers.makeAnnulmentRequest)
 
 	app
 		.route('/leilao-criar-cancelamento')
-		.post(auctionControllers.makeAnnulmentRequest)
+		.post(auctionControllers.makeCancelRequest)
 }

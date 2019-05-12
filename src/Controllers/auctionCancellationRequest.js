@@ -1,7 +1,7 @@
 const { prisma } = require('../../generated/prisma-client')
 const { responsePrismaError } = require('./utils')
 
-const getAuctionCancellationRequests = async (req, res) => {
+const getAuctionAnnulmentRequests = async (req, res) => {
 	try {
 		const query = `
 		query {
@@ -31,7 +31,7 @@ const getAuctionCancellationRequests = async (req, res) => {
 	}
 }
 
-const makeCancelationRequest = async (req, res) => {
+const makeAnnulmentRequest = async (req, res) => {
 	const { auctionId, reason } = req.body
 	try {
 		const auction = await prisma.updateAuction({
@@ -52,7 +52,7 @@ const makeCancelationRequest = async (req, res) => {
 	}
 }
 
-const approveAuctionCancellation = async (req, res) => {
+const approveAuctionAnnulment = async (req, res) => {
 	const { reasonResponse, status, auctionCancellationId } = req.body
 	try {
 		const auctionCancellationRequest = await prisma.updateAuctionCancellationRequest(
@@ -95,7 +95,7 @@ const approveAuctionCancellation = async (req, res) => {
 	}
 }
 
-const makeAnnulmentRequest = async (req, res) => {
+const makeCancelRequest = async (req, res) => {
 	const { auctionId } = req.body
 
 	try {
@@ -133,8 +133,8 @@ const makeAnnulmentRequest = async (req, res) => {
 }
 
 module.exports = {
-	getAuctionCancellationRequests,
-	makeCancelationRequest,
-	approveAuctionCancellation,
+	getAuctionAnnulmentRequests,
 	makeAnnulmentRequest,
+	approveAuctionAnnulment,
+	makeCancelRequest,
 }
