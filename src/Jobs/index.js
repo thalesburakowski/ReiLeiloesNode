@@ -7,12 +7,13 @@ const scheduleJobsActive = async () => {
 		const auctions = await prisma.auctions({ where: { status: 'approved' } })
 		auctions.forEach(auction => {
 			const date = new Date(auction.initialDate)
-
+			console.log(auction)
 			const job = schedule.scheduleJob(date, async () => {
 				await prisma.updateAuction({
 					where: { id: auction.id },
 					data: { status: 'active' },
 				})
+				console.log('ativou um leilão')
 			})
 		})
 	} catch (error) {

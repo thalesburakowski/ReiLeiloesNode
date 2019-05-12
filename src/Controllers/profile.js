@@ -85,26 +85,35 @@ const createProfile = async (req, res) => {
 	}
 }
 
-getHistoric = async (req, res) => {
+const getHistoric = async (req, res) => {
 	const { profileId } = req.params
 
 	try {
-		// const historic = await prisma.bids({ where: { owner: { id: profileId } } })
 		const historic = await prisma.auctions({
 			where: { winner: { id: profileId } },
 		})
-		// consoel.log(
-		// 	await prisma.auctions({ where: { historic_some: { owner: profileId } } })
-		// )
 
-		// tem que continuar pra montar o objeto daora
 		res.json(historic)
 	} catch (error) {
 		responsePrismaError(res, error)
 	}
 }
 
-deleteHistoric = async (req, res) => {
+const getHistoricCreated = async (req, res) => {
+	const { profileId } = req.params
+
+	try {
+		const historic = await prisma.auctions({
+			where: { owner: { id: profileId } },
+		})
+
+		res.json(historic)
+	} catch (error) {
+		responsePrismaError(res, error)
+	}
+}
+
+const deleteHistoric = async (req, res) => {
 	const { auctionId } = req.body
 
 	try {
@@ -130,5 +139,6 @@ module.exports = {
 	getProfileByRg,
 	getProfileByNick,
 	getHistoric,
-	deleteHistoric
+	getHistoricCreated,
+	deleteHistoric,
 }
