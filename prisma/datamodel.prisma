@@ -93,7 +93,6 @@ type Auction {
   initialPrice: Float!
   actualPrice: Float!
   closePrice: Float!
-  finalPrice: Float
   images: [String!]! @scalarList(strategy: RELATION)
   historic: [Bid!]
   status: String!
@@ -133,17 +132,6 @@ type AuctionRequest {
 }
 
 type AuctionCancellationRequest {
-  id: ID! @id
-  auction: Auction!
-  reasonRequest: String!
-  status: Boolean
-  active: Boolean!
-  reasonResponse: String
-  createdAt: DateTime! @createdAt
-  updatedAt: DateTime! @updatedAt
-}
-
-type AuctionAnnulmentRequest {
   id: ID! @id
   auction: Auction!
   reasonRequest: String!

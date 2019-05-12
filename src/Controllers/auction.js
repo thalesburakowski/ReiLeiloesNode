@@ -231,7 +231,7 @@ const getApprovedAcutions = async (req, res) => {
 	}
 }
 
-const deliveryAuction = async (req, res) => {
+const addAddressToAuction = async (req, res) => {
 	const { auctionId, addressId } = req.body
 	try {
 		const auction = await prisma.updateAuction({
@@ -244,11 +244,41 @@ const deliveryAuction = async (req, res) => {
 	}
 }
 
+const deliveringAuction = async (req, res) => {
+	const { auctionId } = req.body
+	try {
+		const auction = await prisma.updateAuction({
+			where: { id: auctionId },
+			data: { status: 'delivering' },
+		})
+
+		res.send(auction)
+	} catch (error) {
+		responsePrismaError(res, error)
+	}
+}
+
+const receivingAuction = async (req, res) => {
+	const { auctionId } = req.body
+	try {
+		const auction = await prisma.updateAuction({
+			where: { id: auctionId },
+			data: { status: 'received' },
+		})
+
+		res.send(auction)
+	} catch (error) {
+		responsePrismaError(res, error)
+	}
+}
+
 module.exports = {
 	getAuction,
 	getApprovedAcutions,
 	createAuction,
 	bidAuction,
-	deliveryAuction,
+	addAddressToAuction,
 	getHistoricBids,
+	deliveringAuction,
+	receivingAuction
 }
