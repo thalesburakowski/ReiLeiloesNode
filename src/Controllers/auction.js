@@ -26,7 +26,7 @@ const createAuction = async (req, res) => {
 		closeDate,
 	} = req.body.auctionData
 
-	let { height, width, depth } = req.body
+	let { height, width, depth } = req.body.auctionData
 	height = parseFloat(height)
 	width = parseFloat(width)
 	depth = parseFloat(depth)
