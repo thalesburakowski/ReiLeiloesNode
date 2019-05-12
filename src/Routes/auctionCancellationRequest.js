@@ -6,10 +6,6 @@ module.exports = app => {
 		.get(auctionControllers.getAuctionCancellationRequests)
 
 	app
-		.route('/leilao-pendente-cancelamento')
-		.get(auctionControllers.getAuctionAnullmentRequests)
-
-	app
 		.route('/leilao-pendente-anulamento')
 		.post(auctionControllers.approveAuctionCancellation)
 
