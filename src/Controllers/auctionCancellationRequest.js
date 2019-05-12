@@ -53,7 +53,7 @@ const makeAnnulmentRequest = async (req, res) => {
 }
 
 const approveAuctionAnnulment = async (req, res) => {
-	const { reasonResponse, status, auctionCancellationId } = req.body
+	const { reasonResponse, status, auctionId, auctionCancellationId } = req.body
 	try {
 		const auctionCancellationRequest = await prisma.updateAuctionCancellationRequest(
 			{
@@ -64,16 +64,16 @@ const approveAuctionAnnulment = async (req, res) => {
 
 		const auction = await prisma.updateAuction({
 			data: { status: status ? 'annuled' : 'annulmentRejected' },
-			where: { id: auction.id },
+			where: { id: auctionId },
 		})
 
 		const walletSeller = await prisma
-			.auction({ id: auction.id })
+			.auction({ id: auctionId })
 			.owner()
 			.wallet()
 
 		const walletWinner = await prisma
-			.auction({ id: auction.id })
+			.auction({ id: auctionId })
 			.winner()
 			.wallet()
 
@@ -89,7 +89,7 @@ const approveAuctionAnnulment = async (req, res) => {
 			data: { credits: walletSeller.credits - auction.actualPrice },
 		})
 
-		res.send(AuctionCancellationRequest)
+		res.send(auctionCancellationRequest)
 	} catch (error) {
 		responsePrismaError(res, error)
 	}
