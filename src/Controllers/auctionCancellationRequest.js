@@ -9,7 +9,7 @@ const getAuctionCancellationRequests = async (req, res) => {
 				reasonRequest,
 				auction {
 					title,
-					finalPrice,
+					actualPrice,
 					owner {
 						name
 					},
@@ -75,13 +75,13 @@ const approveAuctionCancellation = async (req, res) => {
 		const walletWinnerAtualized = await prisma.updateWallet({
 			where: { id: walletWinner.id },
 			data: {
-				pendingCredits: walletWinner.pendingCredits + auction.finalPrice,
+				pendingCredits: walletWinner.pendingCredits + auction.actualPrice,
 			},
 		})
 
 		const walletSellerAtualized = await prisma.updateWallet({
 			where: { id: walletSeller.id },
-			data: { credits: walletSeller.credits - auction.finalPrice },
+			data: { credits: walletSeller.credits - auction.actualPrice },
 		})
 
 		res.send(AuctionCancellationRequest)
@@ -91,6 +91,7 @@ const approveAuctionCancellation = async (req, res) => {
 }
 
 const makeAnnulmentRequest = async (req, res) => {
+	console.log('entrou')
 	const { auctionId } = req.body
 
 	try {
@@ -107,12 +108,12 @@ const makeAnnulmentRequest = async (req, res) => {
 			.wallet()
 
 		const winnerPenalty = await prisma.updateWallet({
-			data: { credits: winnerWallet.credits - auction.finalPrice * 0.2 },
+			data: { credits: winnerWallet.credits - auction.actualPrice * 0.2 },
 			where: { id: winnerWallet.id },
 		})
 
 		const sellerBonus = await prisma.updateWallet({
-			data: { credits: sellerWallet.credits + auction.finalPrice * 1.15 },
+			data: { credits: sellerWallet.credits + auction.actualPrice * 1.15 },
 			where: { id: sellerWallet.id },
 		})
 

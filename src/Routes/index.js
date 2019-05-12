@@ -9,5 +9,7 @@ require('../Routes/wallet')(app)
 require('../Routes/auction')(app)
 require('../Routes/category')(app)
 require('../Routes/auctionRequest')(app)
+require('../Routes/auctionCancellationRequest')(app)
+
 
 module.exports = app
