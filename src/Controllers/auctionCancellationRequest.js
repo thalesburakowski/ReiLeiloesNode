@@ -32,7 +32,7 @@ const makeCancelationRequest = async (req, res) => {
 	try {
 		const auction = await prisma.updateAuction({
 			where: { id: auctionId },
-			data: { status: 'cancelation-request' },
+			data: { status: 'annuledRequest' },
 		})
 
 		const auctionCancellationRequest = await prisma.createAuctionCancellationRequest(
@@ -58,7 +58,7 @@ const approveAuctionCancellation = async (req, res) => {
 			}
 		)
 		const auction = await prisma.updateAuction({
-			data: { status: 'finalized' },
+			data: { status: 'annuled' },
 			where: { id: auction.id },
 		})
 
@@ -91,7 +91,6 @@ const approveAuctionCancellation = async (req, res) => {
 }
 
 const makeAnnulmentRequest = async (req, res) => {
-	console.log('entrou')
 	const { auctionId } = req.body
 
 	try {
