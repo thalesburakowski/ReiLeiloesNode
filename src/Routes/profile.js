@@ -2,7 +2,6 @@ const profileControllers = require('../Controllers/profile')
 
 module.exports = app => {
 	app.route('/profile').post(profileControllers.createProfile)
-	// .put(profileControllers.updatePassword)
 
 	app.route('/profile/:id').get(profileControllers.getProfileByUserId)
 
@@ -17,7 +16,5 @@ module.exports = app => {
   app.route('/profile/historico/:profileId').get(profileControllers.getHistoric)
   
 	app.route('/profile/historico-criados/:profileId').get(profileControllers.getHistoricCreated)
-
-	app.route('/profile/historico/:auctionId').delete(profileControllers.deleteHistoric)
 
 }

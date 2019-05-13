@@ -113,20 +113,6 @@ const getHistoricCreated = async (req, res) => {
 	}
 }
 
-const deleteHistoric = async (req, res) => {
-	const { auctionId } = req.params
-
-	try {
-		const bid = await prisma.updateAuction({
-			where: { id: auctionId },
-			data: { show: false },
-		})
-
-		res.json(bid)
-	} catch (error) {
-		responsePrismaError(res, error)
-	}
-}
 
 module.exports = {
 	createProfile,
@@ -136,5 +122,4 @@ module.exports = {
 	getProfileByNick,
 	getHistoric,
 	getHistoricCreated,
-	deleteHistoric,
 }
