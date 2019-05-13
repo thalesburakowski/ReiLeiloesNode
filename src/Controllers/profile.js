@@ -114,7 +114,7 @@ const getHistoricCreated = async (req, res) => {
 }
 
 const deleteHistoric = async (req, res) => {
-	const { auctionId } = req.body
+	const { auctionId } = req.params
 
 	try {
 		const lastBid = await prisma.bids({
