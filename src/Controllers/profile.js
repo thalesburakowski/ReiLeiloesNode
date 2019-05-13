@@ -117,12 +117,8 @@ const deleteHistoric = async (req, res) => {
 	const { auctionId } = req.params
 
 	try {
-		const lastBid = await prisma.bids({
-			last: 1,
-			where: { auction: { id: auctionId } },
-		})
-		const bid = await prisma.updateBid({
-			where: { id: lastBid.id },
+		const bid = await prisma.updateAuction({
+			where: { id: auctionId },
 			data: { show: false },
 		})
 
