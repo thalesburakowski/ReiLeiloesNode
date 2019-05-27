@@ -10,6 +10,7 @@ require('../Routes/auction')(app)
 require('../Routes/category')(app)
 require('../Routes/auctionRequest')(app)
 require('../Routes/auctionCancellationRequest')(app)
+require('../Routes/analyze')(app)
 
 
 module.exports = app
