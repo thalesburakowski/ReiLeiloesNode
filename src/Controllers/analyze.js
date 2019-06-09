@@ -76,7 +76,7 @@ const generateGraphic = (initialDate, finalDate, auctions) => {
 	const data = Object.values(auctionsByPeriod)
 	return {
 		type: 'line',
-		title: 'Quantidade de leilões no ultimo mês',
+		title: 'Quantidade de leilões criados',
 		labels,
 		datasets: [{ data, label: 'Leilões' }],
 	}
