@@ -212,7 +212,6 @@ const getHistoricBids = async (req, res) => {
 
 const getApprovedAcutions = async (req, res) => {
 	let { title, categories } = req.query
-	categories = JSON.parse(categories)
 
 	try {
 		const auctions = await prisma.auctions({
@@ -221,16 +220,16 @@ const getApprovedAcutions = async (req, res) => {
 					{ OR: [{ status: 'approved' }, { status: 'active' }] },
 					{
 						categories_some: {
-							OR: categories.map(category => {
+							OR: categories ? categories.map(category => {
 								return {
 									id: category,
 								}
-							}),
+							}) : {},
 						},
 					},
 					{
-						title_contains: title
-					}
+						title_contains: title,
+					},
 				],
 			},
 		})
