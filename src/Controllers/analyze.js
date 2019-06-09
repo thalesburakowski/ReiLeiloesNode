@@ -1,74 +1,52 @@
 const { prisma } = require('../../generated/prisma-client')
 const { responsePrismaPrismaError } = require('./utils')
-const groupBy = require('group-by')
+
+const months = {
+	'01': 'jan',
+	'02': 'fev',
+	'03': 'mar',
+	'04': 'abr',
+	'05': 'mai',
+	'06': 'jun',
+	'07': 'jul',
+	'08': 'ago',
+	'09': 'set',
+	'10': 'out',
+	'11': 'nov',
+	'12': 'dez',
+}
 
 const auctionsTotal = async (req, res) => {
-	try {
-		const today = new Date()
-		const actualMonth = new Date().toISOString().split('T')[0]
-		const lastMonth = new Date(today.setMonth(today.getMonth() - 1))
-			.toISOString()
-			.split('T')[0]
-		console.log(actualMonth)
-		console.log(lastMonth)
-		const query = `
+	let { initialDate, finalDate } = req.body
+	initialDate = new Date(initialDate).toISOString().split('T')[0]
+	finalDate = new Date(finalDate).toISOString().split('T')[0]
+	const query = `
     query {
-      auctions(where:{
+      auctions(where: {
         AND: {
-          createdAt_gte: "${lastMonth}"
-          createdAt_lte: "${actualMonth}"
+          createdAt_gte: "${initialDate}"
+          createdAt_lte: "${finalDate}"
         }
       }){
         createdAt
       }
-    }`
-		const responsePrisma = await prisma.$graphql(query)
-		const auctionsDays = responsePrisma.auctions.map(
-			res => res.createdAt.split('T')[0]
-		)
-		const dates = getDates(lastMonth, actualMonth)
-		const labels = dates.map(date => date.split('-')[2])
-		let dataObj = {}
-		dates.map(label => (dataObj[label] = 0))
-		for (let index = 0; index < auctionsDays.length; index++) {
-			dataObj[auctionsDays[index]] = dataObj[auctionsDays[index]] + 1
-		}
+		}`
 
-		const data = Object.values(dataObj)
-
-		const response = {
-			type: 'line',
-			title: 'Quantidade de leilões no ultimo mês',
-			labels,
-			datasets: [{ data, label: 'Leilões' }],
-		}
-
-		return res.send(response)
-	} catch (error) {
-		console.log(error)
-	}
+	const queryResponse = await prisma.$graphql(query)
+	const auctions = queryResponse.auctions
+	res.send(generateGraphic(initialDate, finalDate, auctions))
 }
 
-/*
-O resultado deve mostrar a quantidade de 
-leilões criado daquela categoria naquele dia
-*/
 const auctionsPerCategories = async (req, res) => {
-	try {
-		const today = new Date()
-		// const actualMonth = new Date().toISOString().split('T')[0]
-		let actualMonth = new Date()
-		actualMonth.setDate(today.getDate() + 1)
-		actualMonth = actualMonth.toISOString().split('T')[0]
-		const lastMonth = new Date(today.setMonth(today.getMonth() - 1))
-			.toISOString()
-			.split('T')[0]
-		const query = `
+	let { initialDate, finalDate } = req.body
+	initialDate = new Date(initialDate).toISOString().split('T')[0]
+	finalDate = new Date(finalDate).toISOString().split('T')[0]
+	const query = `
     query {
       auctions(where:{
         AND: {
-          createdAt_gte: "${lastMonth}"
-          createdAt_lte: "${actualMonth}"
+          createdAt_gte: "${initialDate}"
+          createdAt_lte: "${finalDate}"
         }
       }){
         categories {
@@ -76,60 +54,90 @@ const auctionsPerCategories = async (req, res) => {
         }
         createdAt
       }
-    }`
-		const responsePrisma = await prisma.$graphql(query)
-		// console.log(responsePrisma.auctions)
-		const categories = [
-			...new Set(responsePrisma.auctions.map(res => res.categories[0].name)),
-		]
-		const auctions = responsePrisma.auctions.map(res => {
-			return { date: res.createdAt.split('T')[0], categories: res.categories }
-		})
-
-		const auctionsDays = responsePrisma.auctions.map(
-			res => res.createdAt.split('T')[0]
-		)
-
-		const dates = getDates(lastMonth, actualMonth)
-		const labels = dates.map(date => date.split('-')[2])
-		const categoryObj = {}
-
-		categories.map(category => {
-			categoryObj[category] = [...dates]
-		})
-
-		const dataObj = {}
-
-		categories.forEach(category => {
-			dataObj[category] = {}
-			for (let i = 0; i < dates.length; i++) {
-				dataObj[category][dates[i]] = 0
-			}
-		})
-
-		for (let i = 0; i < auctions.length; i++) {
-			auctions[i].categories.forEach(category => {
-				dataObj[category.name][auctions[i].date] =
-					dataObj[category.name][auctions[i].date] + 1
-			})
-		}
-		const response = {
-			type: 'line',
-			title: 'Quantidade de leilões por categoria',
-			labels,
-			datasets: [],
-		}
-		categories.forEach(category => {
-			response.datasets = [
-				...response.datasets,
-				{ label: category, data: [...Object.values(dataObj[category])] },
-			]
-		})
-
-		return res.send(response)	
+		}`
+	try {
+		const queryResponse = await prisma.$graphql(query)
+		const auctions = queryResponse.auctions
+		res.send(generateGraphicByCategories(initialDate, finalDate, auctions))
 	} catch (error) {
 		console.log(error)
 	}
+}
+
+module.exports = {
+	auctionsTotal,
+	auctionsPerCategories,
+}
+
+const generateGraphic = (initialDate, finalDate, auctions) => {
+	const datesInterval = getDates(initialDate, finalDate)
+	const auctionsByPeriod = countAuctionsByPeriod(auctions, datesInterval)
+	const labels = getLabel(datesInterval)
+	const data = Object.values(auctionsByPeriod)
+	return {
+		type: 'line',
+		title: 'Quantidade de leilões no ultimo mês',
+		labels,
+		datasets: [{ data, label: 'Leilões' }],
+	}
+}
+
+const generateGraphicByCategories = (initialDate, finalDate, auctions) => {
+	const datesInterval = getDates(initialDate, finalDate)
+	const categories = getCategories(auctions)
+	const keys = generateKeys(datesInterval)
+	const categoriesCounted = prepareCountCategory(categories, keys);
+	countCategories(auctions, categoriesCounted);
+	const datasets = generateDatasets(categoriesCounted)
+	const labels = getLabel(datesInterval)
+
+	return {
+		type: 'line',
+		title: 'Quantidade de leilões por categoria',
+		labels,
+		datasets,
+	}
+}
+
+function countCategories(auctions, categoriesCounted) {
+	auctions.forEach(auction => {
+		auction.categories.forEach(category => {
+			const date = auction.createdAt.split('T')[0];
+			categoriesCounted[category.name][date]++;
+		});
+	});
+}
+
+function prepareCountCategory(categories, keys) {
+	const categoriesCounted = {};
+	categories.forEach(category => {
+		categoriesCounted[category] = Object.assign({}, keys);
+	});
+	return categoriesCounted;
+}
+
+function generateDatasets(categoriesCounted) {
+	return Object.entries(categoriesCounted).map(([key, value]) => {
+		return {
+			label: key,
+			data: value,
+		};
+	});
+}
+
+function getCategories(auctions) {
+	const categories = new Set()
+	auctions.forEach(auction => {
+		auction.categories.forEach(category => categories.add(category.name))
+	})
+	return Array.from(categories)
+}
+
+function getLabel(datesInterval) {
+	return datesInterval.map(date => {
+		const [_, month, day] = date.split('-')
+		return `${months[month]} ${day}`
+	})
 }
 
 const getDates = function(startDate, endDate) {
@@ -149,7 +157,18 @@ const getDates = function(startDate, endDate) {
 	return dates.map(date => date.toISOString().split('T')[0])
 }
 
-module.exports = {
-	auctionsTotal,
-	auctionsPerCategories,
+const generateKeys = datesInterval => {
+	const obj = {}
+	datesInterval.forEach(date => (obj[date] = 0))
+	return obj
+}
+
+const countAuctionsByPeriod = (auctions, datesInterval) => {
+	const countAuctionsByPeriod = generateKeys(datesInterval)
+	auctions.forEach(auction => {
+		const createdAt = auction.createdAt.split('T')[0]
+		countAuctionsByPeriod[createdAt]++
+	})
+
+	return countAuctionsByPeriod
 }
