@@ -213,6 +213,10 @@ const getHistoricBids = async (req, res) => {
 const getApprovedAcutions = async (req, res) => {
 	let { title, categories } = req.query
 
+	if(categories) categories = JSON.parse(categories)
+
+
+	console.log(categories)
 	try {
 		const auctions = await prisma.auctions({
 			where: {
@@ -233,6 +237,8 @@ const getApprovedAcutions = async (req, res) => {
 				],
 			},
 		})
+
+		console.log(auctions)
 
 		return res.send(auctions)
 	} catch (error) {
