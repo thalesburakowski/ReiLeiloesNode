@@ -120,7 +120,7 @@ function generateDatasets(categoriesCounted) {
 	return Object.entries(categoriesCounted).map(([key, value]) => {
 		return {
 			label: key,
-			data: value,
+			data: Object.values(value),
 		};
 	});
 }
