@@ -35,21 +35,29 @@ const getAuctionSendingRequests = async (req, res) => {
 	try {
 		const query = `
 		query {
-			auctions(where: {
-				status: "annuledSending"
+			auctionCancellationRequests(where:{
+				auction:{
+					id: "cjwph1f6i9i5e0b12soppe2ub"
+				}
 			}){
-				 id
-				 title
-				owner{
-					name
-				}
-				winner{
-					name
-				}
-				actualPrice
+				id
+				auction{
+						 id
+						 title
+						owner{
+							name
+						}
+						winner{
+							name
+						}
+						actualPrice
+					}
+				status
 			}
 		}
 		`
+
+
 		const auctions = await prisma.$graphql(query)
 		res.send(auctions)
 	} catch (error) {
