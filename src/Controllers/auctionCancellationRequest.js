@@ -38,6 +38,7 @@ const getAuctionSendingRequests = async (req, res) => {
 			auctions(where: {
 				status: "annuledSending"
 			}){
+				 id
 				 title
 				owner{
 					name
@@ -164,7 +165,7 @@ const sendingProductAnnulled = async (req, res) => {
 			data: { status: 'annuledSending' },
 			where: { id: auctionId },
 		})
-
+		console.log(auction)
 		res.send(auction)
 	} catch (error) {
 		responsePrismaError(res, error)
@@ -172,8 +173,12 @@ const sendingProductAnnulled = async (req, res) => {
 }
 
 const acceptAuctionAnnuled = async (req, res) => {
-	const { auctionId } = req.body
+	const { auctionId, auctionAnnulmentRequestId } = req.body
 	try {
+		const auctionAnnulmentRequest = await prisma.updateAuctionCancellationRequest(
+			{ where: { id: auctionAnnulmentRequestId }, data: { active: false } }
+		)
+
 		const auction = await prisma.updateAuction({
 			data: { status: 'annuledAccept' },
 			where: { id: auctionId },
