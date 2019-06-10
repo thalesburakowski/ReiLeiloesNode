@@ -132,9 +132,39 @@ const makeCancelRequest = async (req, res) => {
 	}
 }
 
+const sendingProductAnnulled = async (req, res) => {
+	const { auctionId } = req.body
+	try {
+		const auction = await prisma.updateAuction({
+			data: { status: 'annuledSending' },
+			where: { id: auctionId },
+		})
+
+		res.send(auction)
+	} catch (error) {
+		responsePrismaError(res, error)
+	}
+}
+
+const acceptAuctionAnnuled = async (req, res) => {
+	const { auctionId } = req.body
+	try {
+		const auction = await prisma.updateAuction({
+			data: { status: 'annuledAccept' },
+			where: { id: auctionId },
+		})
+
+		res.send(auction)
+	} catch (error) {
+		responsePrismaError(res, error)
+	}
+}
+
 module.exports = {
 	getAuctionAnnulmentRequests,
 	makeAnnulmentRequest,
+	sendingProductAnnulled,
+	acceptAuctionAnnuled,
 	approveAuctionAnnulment,
 	makeCancelRequest,
 }
