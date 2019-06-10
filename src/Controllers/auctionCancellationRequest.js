@@ -35,11 +35,7 @@ const getAuctionSendingRequests = async (req, res) => {
 	try {
 		const query = `
 		query {
-			auctionCancellationRequests(where:{
-				auction:{
-					id: "cjwph1f6i9i5e0b12soppe2ub"
-				}
-			}){
+			auctionCancellationRequests(where:{active: true}){
 				id
 				auction{
 						 id
@@ -56,8 +52,6 @@ const getAuctionSendingRequests = async (req, res) => {
 			}
 		}
 		`
-
-
 		const auctions = await prisma.$graphql(query)
 		res.send(auctions)
 	} catch (error) {
@@ -95,6 +89,8 @@ const approveAuctionAnnulment = async (req, res) => {
 				where: { id: auctionCancellationId },
 			}
 		)
+
+		console.log(auctionCancellationRequest)
 
 		const auction = await prisma.updateAuction({
 			data: { status: status ? 'annuled' : 'annulmentRejected' },
