@@ -114,17 +114,15 @@ const getHistoricCreated = async (req, res) => {
 }
 
 const getTransportInformation = async (req, res) => {
-	const { auctionId } = req.params
-	
+	const { auctionId } = req.body
 	try {
-		const information = await prisma.auction({id: auctionId}).address()
+		const information = await prisma.auction({ id: auctionId }).address()
 
 		res.json(information)
 	} catch (error) {
-		responsePrismaError(res, error)		
+		responsePrismaError(res, error)
 	}
 }
-
 
 module.exports = {
 	createProfile,
@@ -134,5 +132,5 @@ module.exports = {
 	getProfileByNick,
 	getHistoric,
 	getHistoricCreated,
-	getTransportInformation
+	getTransportInformation,
 }
