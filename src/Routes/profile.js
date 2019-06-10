@@ -17,4 +17,6 @@ module.exports = app => {
   
 	app.route('/profile/historico-criados/:profileId').get(profileControllers.getHistoricCreated)
 
+	app.route('/leilao-transporte-informacao').post(profileControllers.getTransportInformation)
+
 }
