@@ -31,6 +31,31 @@ const getAuctionAnnulmentRequests = async (req, res) => {
 	}
 }
 
+const getAuctionSendingRequests = async (req, res) => {
+	try {
+		const query = `
+		query {
+			auctions(where: {
+				status: "annuledSending"
+			}){
+				 title
+				owner{
+					name
+				}
+				winner{
+					name
+				}
+				actualPrice
+			}
+		}
+		`
+		const auctions = await prisma.$graphql(query)
+		res.send(auctions)
+	} catch (error) {
+		responsePrismaError(res, error)
+	}
+}
+
 const makeAnnulmentRequest = async (req, res) => {
 	const { auctionId, reason } = req.body
 	try {
@@ -162,6 +187,7 @@ const acceptAuctionAnnuled = async (req, res) => {
 
 module.exports = {
 	getAuctionAnnulmentRequests,
+	getAuctionSendingRequests,
 	makeAnnulmentRequest,
 	sendingProductAnnulled,
 	acceptAuctionAnnuled,

@@ -24,4 +24,8 @@ module.exports = app => {
 	app
 		.route('/leilao-aceitar-anulamento')
 		.post(auctionControllers.acceptAuctionAnnuled)
+
+	app
+		.route('/leilao-enviando')
+		.get(auctionControllers.getAuctionSendingRequests)
 }
