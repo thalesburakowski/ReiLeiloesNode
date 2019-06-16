@@ -64,9 +64,35 @@ const auctionsPerCategories = async (req, res) => {
 	}
 }
 
+const auctionsTotalValue = async (req, res) => {
+	let { initialDate, finalDate } = req.body
+	initialDate = new Date(initialDate).toISOString().split('T')[0]
+	finalDate = new Date(finalDate).toISOString().split('T')[0]
+	const query = `
+    query {
+      auctions(where:{
+        AND: {
+          createdAt_gte: "${initialDate}"
+          createdAt_lte: "${finalDate}"
+        }
+      }){
+        actualPrice
+        createdAt
+      }
+		}`
+		try {
+			const queryResponse = await prisma.$graphql(query)
+			const auctions = queryResponse.auctions
+			res.send(generateGraphicTotalValue(initialDate, finalDate, auctions))
+		} catch (error) {
+			console.log(error)
+		}
+}
+
 module.exports = {
 	auctionsTotal,
 	auctionsPerCategories,
+	auctionsTotalValue
 }
 
 const generateGraphic = (initialDate, finalDate, auctions) => {
@@ -84,18 +110,31 @@ const generateGraphic = (initialDate, finalDate, auctions) => {
 
 const generateGraphicByCategories = (initialDate, finalDate, auctions) => {
 	const datesInterval = getDates(initialDate, finalDate)
-	const categories = getCategories(auctions)
 	const keys = generateKeys(datesInterval)
+	const labels = getLabel(datesInterval)
+	const categories = getCategories(auctions)
 	const categoriesCounted = prepareCountCategory(categories, keys);
 	countCategories(auctions, categoriesCounted);
 	const datasets = generateDatasets(categoriesCounted)
-	const labels = getLabel(datesInterval)
 
 	return {
 		type: 'line',
 		title: 'Quantidade de leilões por categoria',
 		labels,
 		datasets,
+	}
+}
+
+const generateGraphicTotalValue = (initialDate, finalDate, auctions) => {
+	const datesInterval = getDates(initialDate, finalDate)
+	const labels = getLabel(datesInterval)
+	const auctionsByPeriod = countAuctionsTotalValue(auctions, datesInterval)
+	const data = Object.values(auctionsByPeriod)
+	return {
+		type: 'line',
+		title: 'Valor total de leilões finalizados',
+		labels,
+		datasets: [{ data, label: 'Valor' }],
 	}
 }
 
@@ -171,4 +210,14 @@ const countAuctionsByPeriod = (auctions, datesInterval) => {
 	})
 
 	return countAuctionsByPeriod
+}
+
+const countAuctionsTotalValue = (auctions, datesInterval) => {
+	const countAuctionsTotalValue = generateKeys(datesInterval)
+	auctions.forEach(auction => {
+		const createdAt = auction.createdAt.split('T')[0]
+		countAuctionsTotalValue[createdAt] += auction.actualPrice
+	})
+
+	return countAuctionsTotalValue
 }
