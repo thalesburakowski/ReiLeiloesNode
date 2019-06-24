@@ -35,7 +35,7 @@ const getAuctionSendingRequests = async (req, res) => {
 	try {
 		const query = `
 		query {
-			auctionCancellationRequests(where:{active: true}){
+			auctionCancellationRequests(where:{status: true}){
 				id
 				auction{
 						 id
